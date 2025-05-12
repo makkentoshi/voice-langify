@@ -1,6 +1,7 @@
 import { Context, SessionFlavor } from "grammy";
 import { ConversationFlavor } from "@grammyjs/conversations";
 
+
 export interface SessionData {
   key: string;
   exam?: {
@@ -39,4 +40,6 @@ export interface SpanishTense {
 
 export type BotContext = Context &
   SessionFlavor<SessionData> &
-  ConversationFlavor<Context>;
+  ConversationFlavor<Context> & {
+    sessionStorage: any;
+  };

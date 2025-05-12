@@ -1,77 +1,140 @@
-import { useEffect, useState } from 'react';
-import { initBackButton, initMainButton, useInitData } from '@telegram-apps/sdk-react';
-import './index.css';
+import { useEffect, useState } from "react";
+import {
+  useMainButton,
+  useBackButton,
+  useRawInitData,
+  useBackButtonRaw,
+  useViewport,
+  useViewportRaw,
+  useBiometryManagerRaw,
+} from '@telegram-apps/sdk-react';
+import "./index.css";
+
+declare global {
+  interface Window {
+    Telegram?: {
+      WebApp?: any;
+    };
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
+  }
+}
+
+interface SpeechRecognition extends EventTarget {
+  lang: string;
+  interimResults: boolean;
+  continuous: boolean;
+  start(): void;
+  stop(): void;
+  onresult: (event: SpeechRecognitionEvent) => void;
+  onerror: (event: SpeechRecognitionErrorEvent) => void;
+  onend: () => void;
+}
+
+interface SpeechRecognitionEvent {
+  results: SpeechRecognitionResultList;
+  resultIndex: number;
+}
+
+interface SpeechRecognitionErrorEvent {
+  error: string;
+}
+
+interface SpeechRecognitionResultList {
+  [index: number]: SpeechRecognitionResult;
+  length: number;
+}
+
+interface SpeechRecognitionResult {
+  [index: number]: SpeechRecognitionAlternative;
+  length: number;
+}
+
+interface SpeechRecognitionAlternative {
+  transcript: string;
+}
 
 const App: React.FC = () => {
-  const initData = useInitData();
-  const [backButton] = initBackButton();
-  const [mainButton] = initMainButton();
-  const [transcript, setTranscript] = useState('');
+  const initData = useRawInitData();
+  const [backButton] = useBackButton();
+  const [mainButton] = useMainButton();
+  const [transcript, setTranscript] = useState("");
   const [isRecognizing, setIsRecognizing] = useState(false);
-  const [language, setLanguage] = useState('en-US');
-  const [recognition, setRecognition] = useState<SpeechRecognition | null>(null);
+  const [language, setLanguage] = useState<"en-US" | "es-ES">("en-US");
+  const [recognition, setRecognition] = useState<SpeechRecognition | null>(
+    null
+  );
 
   useEffect(() => {
-    window.Telegram.WebApp.ready();
+    window.Telegram?.WebApp?.ready();
     backButton.hide();
-    mainButton.setParams({ text: 'Send Transcription', is_visible: !!transcript });
-
-    mainButton.on('click', () => {
-      if (transcript) {
-        window.Telegram.WebApp.sendData(JSON.stringify({ transcript, language }));
-        setTranscript('');
-        mainButton.setParams({ is_visible: false });
-      }
+    mainButton.setParams({
+      text: "Send Transcription",
+      is_visible: !!transcript,
     });
 
-    // Initialize Web Speech API
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SpeechRecognition) {
-      const recog = new SpeechRecognition();
+    const handleClick = () => {
+      if (transcript) {
+        window.Telegram?.WebApp?.sendData(
+          JSON.stringify({ transcript, language })
+        );
+        setTranscript("");
+        mainButton.setParams({ is_visible: false });
+      }
+    };
+
+    mainButton.on("click", handleClick);
+
+    const SpeechRecognitionClass =
+      window.SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (SpeechRecognitionClass) {
+      const recog = new SpeechRecognitionClass() as SpeechRecognition;
       recog.lang = language;
       recog.interimResults = true;
       recog.continuous = true;
 
-      recog.onresult = (event) => {
+      recog.onresult = (event: SpeechRecognitionEvent) => {
         const result = event.results[event.resultIndex];
         const text = result[0].transcript;
         setTranscript(text);
+        mainButton.setParams({ is_visible: !!text });
       };
 
-      recog.onerror = (event) => {
-        console.error('Speech recognition error:', event.error);
+      recog.onerror = (event: SpeechRecognitionErrorEvent) => {
+        console.error("Speech recognition error:", event.error);
+        alert(`Error: ${event.error}. Please enable microphone and try again.`);
         setIsRecognizing(false);
-        alert(`Error: ${event.error}. Please ensure microphone access and try again.`);
       };
 
-      recog.onend = () => {
-        setIsRecognizing(false);
-      };
+      recog.onend = () => setIsRecognizing(false);
 
       setRecognition(recog);
     } else {
-      alert('Web Speech API is not supported. Please use a modern browser (Chrome/Safari).');
+      alert(
+        "Web Speech API not supported in this browser. Use Chrome or Safari."
+      );
     }
 
     return () => {
-      mainButton.off('click');
+      mainButton.off("click", handleClick);
     };
-  }, [backButton, mainButton, transcript, language]);
+  }, [transcript, language]);
 
   const toggleRecognition = () => {
     if (!recognition) return;
 
     if (isRecognizing) {
       recognition.stop();
-      setIsRecognizing(false);
     } else {
       recognition.lang = language;
       recognition.start();
-      setIsRecognizing(true);
     }
+
+    setIsRecognizing(!isRecognizing);
   };
 
-  const switchLanguage = (lang: string) => {
+  const switchLanguage = (lang: "en-US" | "es-ES") => {
     setLanguage(lang);
     if (isRecognizing && recognition) {
       recognition.stop();
@@ -87,15 +150,15 @@ const App: React.FC = () => {
       <h1>VoiceLangify</h1>
       <p>Record your voice for IELTS or Spanish practice.</p>
       <div>
-        <button onClick={() => switchLanguage('en-US')}>English</button>
-        <button onClick={() => switchLanguage('es-ES')}>Spanish</button>
+        <button onClick={() => switchLanguage("en-US")}>English</button>
+        <button onClick={() => switchLanguage("es-ES")}>Spanish</button>
       </div>
       <button onClick={toggleRecognition}>
-        {isRecognizing ? 'Stop Recording' : 'Start Recording'}
+        {isRecognizing ? "Stop Recording" : "Start Recording"}
       </button>
       <div>
         <h3>Transcription:</h3>
-        <p>{transcript || 'No transcription yet'}</p>
+        <p>{transcript || "No transcription yet"}</p>
       </div>
     </div>
   );
