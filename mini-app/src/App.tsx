@@ -1,13 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  useMainButton,
-  useBackButton,
-  useRawInitData,
-  useBackButtonRaw,
-  useViewport,
-  useViewportRaw,
-  useBiometryManagerRaw,
-} from '@telegram-apps/sdk-react';
+import { mainButton, backButton, viewport } from "@telegram-apps/sdk-react";
 import "./index.css";
 
 declare global {
@@ -55,9 +47,6 @@ interface SpeechRecognitionAlternative {
 }
 
 const App: React.FC = () => {
-  const initData = useRawInitData();
-  const [backButton] = useBackButton();
-  const [mainButton] = useMainButton();
   const [transcript, setTranscript] = useState("");
   const [isRecognizing, setIsRecognizing] = useState(false);
   const [language, setLanguage] = useState<"en-US" | "es-ES">("en-US");
@@ -70,7 +59,7 @@ const App: React.FC = () => {
     backButton.hide();
     mainButton.setParams({
       text: "Send Transcription",
-      is_visible: !!transcript,
+      isVisible: !!transcript,
     });
 
     const handleClick = () => {
@@ -79,11 +68,11 @@ const App: React.FC = () => {
           JSON.stringify({ transcript, language })
         );
         setTranscript("");
-        mainButton.setParams({ is_visible: false });
+        mainButton.setParams({ isVisible: false });
       }
     };
 
-    mainButton.on("click", handleClick);
+    mainButton.onClick(handleClick);
 
     const SpeechRecognitionClass =
       window.SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -98,7 +87,7 @@ const App: React.FC = () => {
         const result = event.results[event.resultIndex];
         const text = result[0].transcript;
         setTranscript(text);
-        mainButton.setParams({ is_visible: !!text });
+        mainButton.setParams({ isVisible: !!text });
       };
 
       recog.onerror = (event: SpeechRecognitionErrorEvent) => {
@@ -117,7 +106,7 @@ const App: React.FC = () => {
     }
 
     return () => {
-      mainButton.off("click", handleClick);
+      mainButton.offClick(handleClick);
     };
   }, [transcript, language]);
 
