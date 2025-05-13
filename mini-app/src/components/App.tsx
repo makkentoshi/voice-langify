@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { mainButton, backButton, viewport } from "@telegram-apps/sdk-react";
-import "./index.css";
+import "@/index.css";
 
 declare global {
   interface Window {
