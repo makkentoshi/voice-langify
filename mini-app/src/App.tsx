@@ -46,7 +46,7 @@ interface SpeechRecognitionAlternative {
   transcript: string;
 }
 
-const App: React.FC = () => {
+const App = () => {
   const [transcript, setTranscript] = useState("");
   const [isRecognizing, setIsRecognizing] = useState(false);
   const [language, setLanguage] = useState<"en-US" | "es-ES">("en-US");
@@ -55,12 +55,18 @@ const App: React.FC = () => {
   );
 
   useEffect(() => {
-    window.Telegram?.WebApp?.ready();
-    backButton.hide();
-    mainButton.setParams({
-      text: "Send Transcription",
-      isVisible: !!transcript,
-    });
+    if (window.Telegram?.WebApp?.ready) {
+      window.Telegram.WebApp.ready();
+    }
+    if (window.Telegram?.WebApp) {
+      backButton.hide();
+      mainButton.setParams({
+        text: "Send Transcription",
+        isVisible: !!transcript,
+      });
+    } else {
+      console.error("Telegram WebApp SDK not loaded.");
+    }
 
     const handleClick = () => {
       if (transcript) {
@@ -76,6 +82,13 @@ const App: React.FC = () => {
 
     const SpeechRecognitionClass =
       window.SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (
+      typeof window.SpeechRecognition === "undefined" &&
+      typeof (window as any).webkitSpeechRecognition === "undefined"
+    ) {
+      alert("Speech Recognition API is not supported in this browser.");
+    }
 
     if (SpeechRecognitionClass) {
       const recog = new SpeechRecognitionClass() as SpeechRecognition;

@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "mini-app/package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "mini-app/dist" }
+    }
+  ],
+  "routes": [{ "src": "/(.*)", "dest": "mini-app/dist/index.html" }]
+}

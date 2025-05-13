@@ -11,10 +11,11 @@ import { init } from "@/init.ts";
 
 import "./index.css";
 
-// Mock the environment in case, we are outside Telegram.
-import "./mockEnv.ts";
-
 const root = ReactDOM.createRoot(document.getElementById("root")!);
+
+if (process.env.NODE_ENV === "development") {
+  import("./mockEnv.ts");
+}
 
 try {
   const launchParams = retrieveLaunchParams();
