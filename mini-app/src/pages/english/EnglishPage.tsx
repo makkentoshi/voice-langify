@@ -10,7 +10,7 @@ import { Button } from '../../components/ui/Button';
 import { IELTSQuestion } from '../../components/english/IELTSQuestion';
 import { ieltsQuestions } from '../../data/ieltsData';
 import { useProgressStore } from '../../stores/progressStore';
-import { useTelegramRecognition } from '../../hooks/useTelegram'; // ← наш хук
+import { useTelegramRecognition } from '../../hooks/useTelegramRecognition'; // ← наш хук
 
 export const EnglishPage: React.FC = () => {
   // Наш хук инициализирует Telegram.WebApp, backButton, mainButton и SpeechRecognition

@@ -10,6 +10,7 @@ declare global {
     SpeechRecognition: any;
     webkitSpeechRecognition: any;
   }
+
   interface SpeechRecognition {
     continuous: boolean;
     interimResults: boolean;
@@ -21,7 +22,6 @@ declare global {
     onend: () => void;
   }
 }
-
 
 interface SpeechRecognitionEvent {
   results: SpeechRecognitionResultList;
@@ -48,11 +48,21 @@ export function useTelegramRecognition() {
   const [language, setLanguage] = useState<Lang>("en-US");
 
   const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const mountedRef = useRef(true);
 
-  // Инициализация распознавания речи один раз
+  // Отмечаем монтирование
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
+  // Инициализация SpeechRecognition
   useEffect(() => {
     const SpeechRecognitionClass =
       window.SpeechRecognition || window.webkitSpeechRecognition;
+
     if (!SpeechRecognitionClass) {
       alert("Speech recognition not supported in this browser.");
       return;
@@ -67,17 +77,23 @@ export function useTelegramRecognition() {
       const result = evt.results[evt.resultIndex];
       const text = result[0].transcript;
       setTranscript(text);
-      mainButton.setParams({ isVisible: !!text });
+      if (mountedRef.current) {
+        mainButton.setParams({ isVisible: !!text });
+      }
     };
 
     recog.onerror = (e: SpeechRecognitionErrorEvent) => {
       console.error("Speech recognition error:", e);
-      alert(`Speech Recognition Error: ${e.error}`);
-      setIsRecognizing(false);
+      if (mountedRef.current) {
+        alert(`Speech Recognition Error: ${e.error}`);
+        setIsRecognizing(false);
+      }
     };
 
     recog.onend = () => {
-      setIsRecognizing(false);
+      if (mountedRef.current) {
+        setIsRecognizing(false);
+      }
     };
 
     recognitionRef.current = recog;
@@ -87,8 +103,10 @@ export function useTelegramRecognition() {
     };
   }, []);
 
-  // Обработка нажатия основной кнопки Telegram
+  // Telegram mainButton logic
   useEffect(() => {
+    if (!mountedRef.current) return;
+
     backButton.hide();
     mainButton.setParams({ text: "Send Transcription", isVisible: false });
 
@@ -99,19 +117,23 @@ export function useTelegramRecognition() {
       window.Telegram?.WebApp?.sendData(JSON.stringify(payload));
 
       setTranscript("");
-      mainButton.setParams({ isVisible: false });
+      if (mountedRef.current) {
+        mainButton.setParams({ isVisible: false });
+      }
     };
 
     mainButton.onClick(handleClick);
-    return () => mainButton.offClick(handleClick);
+    return () => {
+      mainButton.offClick(handleClick);
+    };
   }, [transcript, language]);
 
-  // Обновление языка распознавания
+  // Язык
   const switchLanguage = useCallback(
     (lang: Lang) => {
       setLanguage(lang);
-
       const recog = recognitionRef.current;
+
       if (isRecognizing && recog) {
         recog.stop();
         setTimeout(() => {
@@ -125,7 +147,7 @@ export function useTelegramRecognition() {
     [isRecognizing]
   );
 
-  // Переключение состояния распознавания
+  // Вкл/выкл
   const toggleRecognition = useCallback(() => {
     const recog = recognitionRef.current;
     if (!recog) {
