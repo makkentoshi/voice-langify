@@ -1,13 +1,13 @@
 // src/components/App.tsx
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Layout } from './Layout';
-import { BottomBar } from './BottomBar';
-import HomePage from '@/pages/HomePage';
-import { EnglishPage } from '@/pages/english/EnglishPage';
-import SpanishPage from '@/pages/spanish/SpanishPage';
-import FlashcardsPage from '@/pages/spanish/FlashcardsPage';
-import GrammarPage from '@/pages/spanish/GrammarPage';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Layout } from "./Layout";
+import { BottomBar } from "./BottomBar";
+import HomePage from "@/pages/HomePage";
+import EnglishPage from "@/pages/english/EnglishPage";
+import SpanishPage from "@/pages/spanish/SpanishPage";
+import FlashcardsPage from "@/pages/spanish/FlashcardsPage";
+import GrammarPage from "@/pages/spanish/GrammarPage";
 
 export default function App() {
   return (

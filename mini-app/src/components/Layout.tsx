@@ -1,13 +1,20 @@
 // src/components/Layout.tsx
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Outlet } from 'react-router-dom';
-import { mainButton } from "@telegram-apps/sdk-react";
+import { mainButton } from '@telegram-apps/sdk-react';
 
 export const Layout: React.FC = () => {
+  const mountedRef = useRef(true);
+
   useEffect(() => {
+    mountedRef.current = true;
     return () => {
-      // Скрыть mainButton при переходе на другие страницы
-      mainButton.setParams({ isVisible: false });
+      mountedRef.current = false;
+      try {
+        mainButton.setParams({ isVisible: false });
+      } catch (e) {
+        console.warn('mainButton.setParams failed on unmounted component:', e);
+      }
     };
   }, []);
 

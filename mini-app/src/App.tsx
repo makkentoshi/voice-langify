@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { BottomBar } from "@/components/BottomBar";
 import HomePage from "@/pages/HomePage";
-import { EnglishPage } from "@/pages/english/EnglishPage";
+import EnglishPage from "@/pages/english/EnglishPage";
 import SpanishPage from "@/pages/spanish/SpanishPage";
 import FlashcardsPage from "@/pages/spanish/FlashcardsPage";
 import GrammarPage from "@/pages/spanish/GrammarPage";
