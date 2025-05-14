@@ -124,7 +124,7 @@ export const EnglishPage: React.FC = () => {
                         return (
                           <span
                             key={q.id}
-                            className={`inline-block w-6 h-6 rounded-full text-xs flex items-center justify-center
+                            className={`w-6 h-6 rounded-full text-xs flex items-center justify-center
                               ${completed ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600'}`}
                           >
                             {qIdx + 1}
