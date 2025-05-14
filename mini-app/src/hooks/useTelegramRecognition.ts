@@ -104,9 +104,11 @@ export function useTelegramRecognition() {
   }, []);
 
   // Telegram mainButton logic
+  // Telegram mainButton logic
   useEffect(() => {
     if (!mountedRef.current) return;
 
+    mainButton.mount();
     backButton.hide();
     mainButton.setParams({ text: "Send Transcription", isVisible: false });
 
@@ -125,6 +127,7 @@ export function useTelegramRecognition() {
     mainButton.onClick(handleClick);
     return () => {
       mainButton.offClick(handleClick);
+      mainButton.unmount();
     };
   }, [transcript, language]);
 

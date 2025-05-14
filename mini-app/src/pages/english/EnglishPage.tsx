@@ -23,13 +23,24 @@ export default function EnglishPage() {
     switchLanguage,
   } = useTelegramRecognition();
 
+  
   useEffect(() => {
-    mainButton.mount(); // <--- теперь можно вызывать setParams
-    mainButton.setParams({ text: "Send", isVisible: false });
-
+    let isMounted = true;
+  
+    try {
+      mainButton.mount();
+      mainButton.setParams({ text: "Send", isVisible: false });
+    } catch (e) {
+      console.warn("mainButton error on mount:", e);
+    }
+  
     return () => {
-      mainButton.setParams({ isVisible: false });
-      mainButton.unmount(); // <--- обязательно
+      isMounted = false;
+      try {
+        mainButton.unmount();
+      } catch (e) {
+        console.warn("mainButton unmount error:", e);
+      }
     };
   }, []);
 
