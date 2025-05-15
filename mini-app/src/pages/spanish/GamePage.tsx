@@ -1,304 +1,143 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import PageTransition from "@/components/ui/PageTransition";
-import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";                      
-import { ChevronLeft, Trophy, RefreshCw, Star } from "lucide-react";
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { ArrowLeft, Trophy, Star, Timer } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Card } from "@/components/ui/new/Card";
+import { Button } from "@/components/ui/new/Button";
+import { useTelegramInit } from "@/hooks/useTelegramInit";
+import { cn } from "@/lib/utils";
 
-// Quiz data
-interface QuizQuestion {
-  id: number;
-  question: string;
-  correctAnswer: string;
-  options: { text: string; emoji: string }[];
-}
-
-const quizQuestions: QuizQuestion[] = [
+const gameModes = [
   {
-    id: 1,
-    question: "Which of these is 'the cheese'?",
-    correctAnswer: "el queso",
-    options: [
-      { text: "el queso", emoji: "🧀" },
-      { text: "el pan", emoji: "🍞" },
-      { text: "la leche", emoji: "🥛" },
-      { text: "la manzana", emoji: "🍎" },
-    ],
+    title: "Word Match",
+    description: "Match Spanish words with their English translations",
+    icon: <Star className="w-8 h-8" />,
+    color: "from-purple-500/80 to-purple-600/80",
+    image:
+      "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?ixlib=rb-4.0.3",
   },
   {
-    id: 2,
-    question: "Which of these is 'the dog'?",
-    correctAnswer: "el perro",
-    options: [
-      { text: "el gato", emoji: "🐱" },
-      { text: "el pájaro", emoji: "🐦" },
-      { text: "el perro", emoji: "🐶" },
-      { text: "el pez", emoji: "🐠" },
-    ],
+    title: "Time Challenge",
+    description: "Answer as many questions as possible in 60 seconds",
+    icon: <Timer className="w-8 h-8" />,
+    color: "from-blue-500/80 to-blue-600/80",
+    image:
+      "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?ixlib=rb-4.0.3",
   },
   {
-    id: 3,
-    question: "Which of these is 'the house'?",
-    correctAnswer: "la casa",
-    options: [
-      { text: "el coche", emoji: "🚗" },
-      { text: "la casa", emoji: "🏠" },
-      { text: "el edificio", emoji: "🏢" },
-      { text: "el parque", emoji: "🏞️" },
-    ],
-  },
-  {
-    id: 4,
-    question: "Which of these is 'good morning'?",
-    correctAnswer: "buenos días",
-    options: [
-      { text: "buenas noches", emoji: "🌙" },
-      { text: "buenos días", emoji: "☀️" },
-      { text: "buenas tardes", emoji: "🌇" },
-      { text: "hola", emoji: "👋" },
-    ],
-  },
-  {
-    id: 5,
-    question: "Which of these is 'the water'?",
-    correctAnswer: "el agua",
-    options: [
-      { text: "el vino", emoji: "🍷" },
-      { text: "la cerveza", emoji: "🍺" },
-      { text: "el café", emoji: "☕" },
-      { text: "el agua", emoji: "💧" },
-    ],
+    title: "Grammar Quiz",
+    description: "Test your knowledge of Spanish grammar",
+    icon: <Trophy className="w-8 h-8" />,
+    color: "from-green-500/80 to-green-600/80",
+    image:
+      "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?ixlib=rb-4.0.3",
   },
 ];
 
-const GamePage: React.FC = () => {
-  const navigate = useNavigate();
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [score, setScore] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
-  const [isAnswered, setIsAnswered] = useState(false);
-  const [isGameFinished, setIsGameFinished] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(15);
-  const [isTimerRunning, setIsTimerRunning] = useState(true);
-
-  const handleBackClick = () => {
-    navigate(-1);
-  };
-
-  const handleAnswerSelect = (answer: string) => {
-    if (isAnswered) return;
-
-    setSelectedAnswer(answer);
-    setIsAnswered(true);
-    setIsTimerRunning(false);
-
-    if (answer === quizQuestions[currentQuestion].correctAnswer) {
-      setScore(score + 1);
-    }
-
-    setTimeout(() => {
-      if (currentQuestion < quizQuestions.length - 1) {
-        setCurrentQuestion(currentQuestion + 1);
-        setSelectedAnswer(null);
-        setIsAnswered(false);
-        setTimeLeft(15);
-        setIsTimerRunning(true);
-      } else {
-        setIsGameFinished(true);
-      }
-    }, 1500);
-  };
-
-  const resetGame = () => {
-    setCurrentQuestion(0);
-    setScore(0);
-    setSelectedAnswer(null);
-    setIsAnswered(false);
-    setIsGameFinished(false);
-    setTimeLeft(15);
-    setIsTimerRunning(true);
-  };
-
-  // Timer effect
-  useEffect(() => {
-    if (isTimerRunning && timeLeft > 0) {
-      const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
-      return () => clearTimeout(timer);
-    } else if (isTimerRunning && timeLeft === 0) {
-      setIsAnswered(true);
-      setIsTimerRunning(false);
-
-      setTimeout(() => {
-        if (currentQuestion < quizQuestions.length - 1) {
-          setCurrentQuestion(currentQuestion + 1);
-          setSelectedAnswer(null);
-          setIsAnswered(false);
-          setTimeLeft(15);
-          setIsTimerRunning(true);
-        } else {
-          setIsGameFinished(true);
-        }
-      }, 1500);
-    }
-  }, [timeLeft, isTimerRunning, currentQuestion]);
+export default function GamePage() {
+  useTelegramInit("#FFFFFFFF", false);
+  const [hovered, setHovered] = useState<number | null>(null);
 
   return (
-    <PageTransition>
-      <div className="space-y-6">
-        <motion.div
-          className="flex items-center mb-4"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          <button
-            onClick={handleBackClick}
-            className="ios-back-button flex items-center"
-          >
-            <ChevronLeft size={20} />
-            <span>Back</span>
-          </button>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="flex justify-between items-center"
-        >
-          <div>
-            <h1 className="text-2xl font-bold">Spanish Game</h1>
-            <p className="text-gray-500 mt-1">Test your vocabulary</p>
-          </div>
-
-          {!isGameFinished && (
-            <div className="bg-primary-100 text-primary-500 px-3 py-1 rounded-full text-sm font-medium">
-              Score: {score}
-            </div>
-          )}
-        </motion.div>
-
-        {!isGameFinished ? (
-          <div className="space-y-5">
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-500">
-                Question {currentQuestion + 1} of {quizQuestions.length}
-              </span>
-
-              <div className="flex items-center">
-                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                  <span
-                    className={`text-sm font-medium ${
-                      timeLeft <= 5 ? "text-danger-500" : "text-gray-700"
-                    }`}
-                  >
-                    {timeLeft}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="w-full h-1 bg-gray-100 rounded-full overflow-hidden">
-              <motion.div
-                className="h-full bg-primary-500 rounded-full"
-                initial={{ width: 0 }}
-                animate={{
-                  width: `${
-                    ((currentQuestion + 1) / quizQuestions.length) * 100
-                  }%`,
-                }}
-                transition={{ duration: 0.5 }}
-              />
-            </div>
-
-            <Card className="p-5">
-              <h2 className="text-xl font-semibold text-center mb-6">
-                {quizQuestions[currentQuestion].question}
-              </h2>
-
-              <div className="grid grid-cols-2 gap-4">
-                {quizQuestions[currentQuestion].options.map((option, index) => {
-                  const isCorrect =
-                    option.text ===
-                    quizQuestions[currentQuestion].correctAnswer;
-                  const isSelected = selectedAnswer === option.text;
-                  let bgColor = "bg-white";
-
-                  if (isAnswered) {
-                    if (isCorrect) {
-                      bgColor = "bg-success-100 border-success-500";
-                    } else if (isSelected && !isCorrect) {
-                      bgColor = "bg-danger-100 border-danger-500";
-                    }
-                  }
-
-                  return (
-                    <motion.div
-                      key={index}
-                      whileTap={!isAnswered ? { scale: 0.95 } : {}}
-                      className={`border rounded-ios p-4 text-center cursor-pointer transition-colors duration-200 ${bgColor}`}
-                      onClick={() => handleAnswerSelect(option.text)}
-                    >
-                      <span className="text-3xl block mb-2">
-                        {option.emoji}
-                      </span>
-                      <span className="font-medium">{option.text}</span>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            </Card>
-          </div>
-        ) : (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="min-h-screen bg-black text-white"
+    >
+      <header className="relative overflow-hidden py-12">
+        <div className="absolute inset-0 bg-gradient-to-b from-black to-transparent opacity-50"></div>
+        <div className="relative z-10 text-center">
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex items-center justify-center mb-8"
           >
-            <Card className="p-6 text-center">
-              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-primary-100 flex items-center justify-center">
-                <Trophy className="text-primary-500" size={36} />
+            <span className="text-8xl mr-4">🎮</span>
+            <h1 className="text-4xl font-bold text-white">Spanish Games</h1>
+          </motion.div>
+        </div>
+      </header>
+
+      <main className="px-4 py-8">
+        <div className="max-w-6xl mx-auto space-y-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {gameModes.map((mode, index) => (
+              <motion.div
+                key={mode.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                onMouseEnter={() => setHovered(index)}
+                onMouseLeave={() => setHovered(null)}
+                className={cn(
+                  "relative rounded-2xl overflow-hidden h-[300px] transition-all duration-500",
+                  hovered !== null &&
+                    hovered !== index &&
+                    "blur-sm scale-[0.98]"
+                )}
+              >
+                <div
+                  className="absolute inset-0 bg-cover bg-center transition-transform duration-700"
+                  style={{
+                    backgroundImage: `url(${mode.image})`,
+                    transform: hovered === index ? "scale(1.1)" : "scale(1)",
+                  }}
+                />
+                <div
+                  className={cn(
+                    "absolute inset-0 bg-gradient-to-t",
+                    mode.color
+                  )}
+                />
+                <div className="absolute inset-0 flex flex-col items-center justify-center p-8">
+                  <div className="text-4xl mb-4">{mode.icon}</div>
+                  <h3 className="text-2xl font-bold mb-2">{mode.title}</h3>
+                  <p className="text-lg opacity-90 mb-4 text-center">
+                    {mode.description}
+                  </p>
+                  <Button
+                    variant="gradient"
+                    className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-blue-500 hover:to-purple-500"
+                  >
+                    Play Now
+                  </Button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className="mt-12 max-w-2xl mx-auto"
+          >
+            <Card className="bg-white/5 backdrop-blur-lg rounded-2xl p-6">
+              <h2 className="text-xl font-semibold mb-6">Leaderboard</h2>
+              <div className="space-y-4">
+                {[1, 2, 3].map((rank) => (
+                  <div
+                    key={rank}
+                    className="flex items-center justify-between p-4 bg-white/10 rounded-lg"
+                  >
+                    <div className="flex items-center">
+                      <span className="text-2xl mr-4">🏆</span>
+                      <div>
+                        <h3 className="font-medium">Player {rank}</h3>
+                        <p className="text-sm text-white/70">
+                          Score: {1000 - (rank - 1) * 100}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-lg font-bold">#{rank}</span>
+                  </div>
+                ))}
               </div>
-
-              <h2 className="text-2xl font-bold mb-2">Game Completed!</h2>
-              <p className="text-gray-500 mb-3">Your Score</p>
-
-              <div className="flex items-center justify-center mb-4">
-                <span className="text-4xl font-bold text-primary-500">
-                  {score}
-                </span>
-                <span className="text-gray-500 ml-1">
-                  / {quizQuestions.length}
-                </span>
-              </div>
-
-              <div className="flex justify-center mb-6">
-                {[...Array(5)].map((_, i) => {
-                  const percentage = (score / quizQuestions.length) * 100;
-                  const stars = Math.round((percentage / 100) * 5);
-                  return (
-                    <Star
-                      key={i}
-                      size={24}
-                      className={
-                        i < stars
-                          ? "text-warning-500 fill-warning-500"
-                          : "text-gray-300"
-                      }
-                    />
-                  );
-                })}
-              </div>
-
-              <Button onClick={resetGame} icon={<RefreshCw size={18} />}>
-                Play Again
-              </Button>
             </Card>
           </motion.div>
-        )}
-      </div>
-    </PageTransition>
+        </div>
+      </main>
+    </motion.div>
   );
-};
-
-export default GamePage;
+}

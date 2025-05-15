@@ -200,7 +200,7 @@ export default function EnglishPage() {
                   onClick={() => setShowGptChat(true)}
                   fullWidth
                   variant="gradient"
-                  className="bg-gradient-to-r from-[#012169] to-[#C8102E] hover:from-[#C8102E] hover:to-[#012169]"
+                  className="bg-gradient-to-r from-[#080169] to-[#ff0000] hover:from-[#C8102E] hover:to-[#012169]"
                 >
                   Start Speaking Practice
                 </Button>
