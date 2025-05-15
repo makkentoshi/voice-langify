@@ -1,13 +1,7 @@
 // src/pages/spanish/GrammarPage.tsx
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import {
-  ArrowLeft,
-  MessageSquare,
-  ChevronRight,
-  ThumbsUp,
-  MessageCircle,
-} from "lucide-react";
+import { ArrowLeft, BookOpen, Clock, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/new/Card";
 import { Button } from "@/components/ui/new/Button";
@@ -18,60 +12,125 @@ const grammarTopics = [
   {
     id: 1,
     title: "Present Tense (Presente)",
-    description:
-      "Used to talk about habitual actions, general truths, and current states.",
-    author: "Maria Garcia",
-    replies: 24,
-    likes: 156,
-    lastActivity: "2h ago",
-    examples: [
-      {
-        spanish: "Yo hablo español.",
-        english: "I speak Spanish.",
-      },
-      {
-        spanish: "Ella vive en Madrid.",
-        english: "She lives in Madrid.",
-      },
-    ],
+    description: "Learn how to use the present tense in Spanish",
+    level: "Beginner",
+    duration: "15 min",
+    progress: 40,
+    icon: "📝",
+    content: {
+      explanation:
+        "The present tense in Spanish is used to talk about habitual actions, general truths, and current states. It's one of the most commonly used tenses in everyday conversation.",
+      rules: [
+        "Regular -ar verbs: Remove -ar and add -o, -as, -a, -amos, -áis, -an",
+        "Regular -er verbs: Remove -er and add -o, -es, -e, -emos, -éis, -en",
+        "Regular -ir verbs: Remove -ir and add -o, -es, -e, -imos, -ís, -en",
+      ],
+      examples: [
+        {
+          spanish: "Yo hablo español todos los días.",
+          english: "I speak Spanish every day.",
+          note: "Habitual action",
+        },
+        {
+          spanish: "Ella vive en Madrid.",
+          english: "She lives in Madrid.",
+          note: "Current state",
+        },
+        {
+          spanish: "El sol sale por el este.",
+          english: "The sun rises in the east.",
+          note: "General truth",
+        },
+      ],
+      commonUses: [
+        "Describing daily routines",
+        "Expressing current states",
+        "Stating general truths",
+        "Making observations",
+      ],
+    },
   },
   {
     id: 2,
     title: "Past Tense (Pretérito)",
-    description: "Used to talk about completed actions in the past.",
-    author: "Carlos Rodriguez",
-    replies: 18,
-    likes: 98,
-    lastActivity: "5h ago",
-    examples: [
-      {
-        spanish: "Yo hablé con él ayer.",
-        english: "I spoke with him yesterday.",
-      },
-      {
-        spanish: "Ella compró un libro.",
-        english: "She bought a book.",
-      },
-    ],
+    description: "Master the past tense for completed actions",
+    level: "Intermediate",
+    duration: "20 min",
+    progress: 60,
+    icon: "⏰",
+    content: {
+      explanation:
+        "The preterite tense is used to talk about completed actions in the past. It's perfect for telling stories and describing specific events that happened at a particular time.",
+      rules: [
+        "Regular -ar verbs: Remove -ar and add -é, -aste, -ó, -amos, -asteis, -aron",
+        "Regular -er/-ir verbs: Remove -er/-ir and add -í, -iste, -ió, -imos, -isteis, -ieron",
+        "Irregular verbs have unique conjugations",
+      ],
+      examples: [
+        {
+          spanish: "Ayer compré un libro nuevo.",
+          english: "Yesterday I bought a new book.",
+          note: "Completed action",
+        },
+        {
+          spanish: "El año pasado visité España.",
+          english: "Last year I visited Spain.",
+          note: "Specific time period",
+        },
+        {
+          spanish: "¿Qué hiciste el fin de semana?",
+          english: "What did you do on the weekend?",
+          note: "Asking about past events",
+        },
+      ],
+      commonUses: [
+        "Telling stories",
+        "Describing completed actions",
+        "Talking about specific past events",
+        "Sequencing past events",
+      ],
+    },
   },
   {
     id: 3,
     title: "Imperfect Tense (Imperfecto)",
-    description: "Used to describe ongoing or habitual actions in the past.",
-    author: "Ana Martinez",
-    replies: 32,
-    likes: 210,
-    lastActivity: "1d ago",
-    examples: [
-      {
-        spanish: "Yo hablaba con él todos los días.",
-        english: "I used to speak with him every day.",
-      },
-      {
-        spanish: "Cuando era niño, jugaba al fútbol.",
-        english: "When I was a child, I used to play soccer.",
-      },
-    ],
+    description: "Learn to describe ongoing past actions",
+    level: "Intermediate",
+    duration: "25 min",
+    progress: 20,
+    icon: "🔄",
+    content: {
+      explanation:
+        "The imperfect tense is used to describe ongoing or habitual actions in the past. It's perfect for setting the scene and describing background information.",
+      rules: [
+        "Regular -ar verbs: Remove -ar and add -aba, -abas, -aba, -ábamos, -abais, -aban",
+        "Regular -er/-ir verbs: Remove -er/-ir and add -ía, -ías, -ía, -íamos, -íais, -ían",
+        "Only three irregular verbs: ser, ir, and ver",
+      ],
+      examples: [
+        {
+          spanish: "Cuando era niño, jugaba al fútbol todos los días.",
+          english: "When I was a child, I used to play soccer every day.",
+          note: "Habitual action",
+        },
+        {
+          spanish: "Era una noche oscura y llovía mucho.",
+          english: "It was a dark night and it was raining a lot.",
+          note: "Setting the scene",
+        },
+        {
+          spanish: "Mi abuela siempre cocinaba los domingos.",
+          english: "My grandmother always cooked on Sundays.",
+          note: "Repeated action",
+        },
+      ],
+      commonUses: [
+        "Describing past habits",
+        "Setting the scene",
+        "Talking about age and time",
+        "Describing ongoing past actions",
+      ],
+    },
   },
 ];
 
@@ -91,7 +150,7 @@ export default function GrammarPage() {
             <Link to="/spanish" className="text-blue-500">
               <ArrowLeft size={24} />
             </Link>
-            <h1 className="text-xl font-semibold">Grammar Forum</h1>
+            <h1 className="text-xl font-semibold">Spanish Grammar</h1>
             <div className="w-6" />
           </div>
         </div>
@@ -114,27 +173,38 @@ export default function GrammarPage() {
                 onClick={() => setSelectedTopic(topic.id)}
               >
                 <div className="p-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                        {topic.title}
-                      </h3>
-                      <p className="text-sm text-gray-600 mb-3">
+                  <div className="flex items-start space-x-4">
+                    <div className="text-4xl">{topic.icon}</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-semibold text-gray-900 truncate">
+                          {topic.title}
+                        </h3>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">
                         {topic.description}
                       </p>
-                      <div className="flex items-center space-x-4 text-sm text-gray-500">
+                      <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
                         <div className="flex items-center">
-                          <MessageSquare className="w-4 h-4 mr-1" />
-                          <span>{topic.replies}</span>
+                          <BookOpen className="w-4 h-4 mr-1" />
+                          <span>{topic.level}</span>
                         </div>
                         <div className="flex items-center">
-                          <ThumbsUp className="w-4 h-4 mr-1" />
-                          <span>{topic.likes}</span>
+                          <Clock className="w-4 h-4 mr-1" />
+                          <span>{topic.duration}</span>
                         </div>
-                        <span>{topic.lastActivity}</span>
+                        <div className="flex items-center">
+                          <Star className="w-4 h-4 mr-1" />
+                          <span>{topic.progress}%</span>
+                        </div>
+                      </div>
+                      <div className="mt-3 w-full h-1 bg-gray-100 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-blue-500 rounded-full transition-all duration-500"
+                          style={{ width: `${topic.progress}%` }}
+                        />
                       </div>
                     </div>
-                    <ChevronRight className="text-gray-400" size={20} />
                   </div>
 
                   {selectedTopic === topic.id && (
@@ -142,37 +212,70 @@ export default function GrammarPage() {
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
                       exit={{ opacity: 0, height: 0 }}
-                      className="mt-4 pt-4 border-t border-gray-100"
+                      className="mt-6 pt-6 border-t border-gray-100"
                     >
-                      <div className="space-y-3">
-                        {topic.examples.map((example, index) => (
-                          <div
-                            key={index}
-                            className="bg-gray-50 rounded-lg p-3 text-sm"
-                          >
-                            <p className="text-gray-900 font-medium mb-1">
-                              {example.spanish}
-                            </p>
-                            <p className="text-gray-600">{example.english}</p>
+                      <div className="space-y-6">
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-900 mb-2">
+                            Explanation
+                          </h4>
+                          <p className="text-gray-600">
+                            {topic.content.explanation}
+                          </p>
+                        </div>
+
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-900 mb-2">
+                            Rules
+                          </h4>
+                          <ul className="list-disc list-inside space-y-1 text-gray-600">
+                            {topic.content.rules.map((rule, index) => (
+                              <li key={index}>{rule}</li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-900 mb-2">
+                            Examples
+                          </h4>
+                          <div className="space-y-3">
+                            {topic.content.examples.map((example, index) => (
+                              <div
+                                key={index}
+                                className="bg-gray-50 rounded-lg p-3"
+                              >
+                                <p className="text-gray-900 font-medium">
+                                  {example.spanish}
+                                </p>
+                                <p className="text-gray-600 text-sm">
+                                  {example.english}
+                                </p>
+                                <p className="text-gray-500 text-xs mt-1">
+                                  {example.note}
+                                </p>
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
-                      <div className="mt-4 flex items-center space-x-2">
+                        </div>
+
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-900 mb-2">
+                            Common Uses
+                          </h4>
+                          <ul className="list-disc list-inside space-y-1 text-gray-600">
+                            {topic.content.commonUses.map((use, index) => (
+                              <li key={index}>{use}</li>
+                            ))}
+                          </ul>
+                        </div>
+
                         <Button
                           variant="outline"
                           size="sm"
-                          className="text-blue-500 border-blue-500"
+                          className="w-full text-blue-500 border-blue-500"
                         >
-                          <ThumbsUp className="w-4 h-4 mr-1" />
-                          Like
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="text-gray-500 border-gray-300"
-                        >
-                          <MessageCircle className="w-4 h-4 mr-1" />
-                          Reply
+                          Practice This Topic
                         </Button>
                       </div>
                     </motion.div>
