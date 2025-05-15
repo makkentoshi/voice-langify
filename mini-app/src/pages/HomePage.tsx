@@ -115,10 +115,10 @@ const HomePage: React.FC = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-black to-transparent opacity-50"></div>
         <div className="relative z-10 text-center">
           <motion.h1
-            className="text-4xl font-bold mb-8"
+            className="text-4xl font-bold mb-8 text-white"
             variants={itemVariants}
           >
-            Language Learner
+            Hola!
           </motion.h1>
           <motion.div
             className="flex flex-col items-center justify-center space-y-2"
@@ -185,7 +185,7 @@ const HomePage: React.FC = () => {
                 {dailyPhrases.map((phrase, index) => (
                   <motion.div
                     key={index}
-                    className="border-b border-white/10 pb-4 last:border-0 last:pb-0"
+                    className="border-b border-white/10 pb-4 last:border-0 last:pb-0 text-white"
                     variants={itemVariants}
                   >
                     <p className="font-medium text-lg">{phrase.spanish}</p>
