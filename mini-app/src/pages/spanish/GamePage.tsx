@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import PageTransition from "@/components/ui/PageTransition";
 import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";                      
 import { ChevronLeft, Trophy, RefreshCw, Star } from "lucide-react";
 
 // Quiz data

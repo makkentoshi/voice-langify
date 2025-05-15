@@ -3,9 +3,9 @@ import React, { useMemo } from "react"; // Убрали useState, если activ
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
-// Импорты из первого файла (основной UI и стили)
-import PageTransition from "@/components/ui/PageTransition"; // Путь из первого файла
-import { Card } from "@/components/ui/Card"; // Путь из первого файла
+
+import PageTransition from "@/components/ui/PageTransition"; 
+import Card from "@/components/ui/new/Card"; 
 import {
   BookOpen,
   MessageCircle,
@@ -13,24 +13,24 @@ import {
   Gamepad2,
   GraduationCap,
   ChevronRight,
-  ArrowLeft, // Добавлена для кнопки назад
+  ArrowLeft, 
   MessageSquare,
 } from "lucide-react";
 
-// Импорты из второго файла (логика, Telegram, специфичные UI компоненты)
-import { ProgressBar as UiProgressBar } from "../../components/ui/ProgressBar"; // Переименовал, чтобы избежать конфликта, если есть другой ProgressBar
-import { Button as UiButton } from "../../components/ui/Button"; // Переименовал, чтобы избежать конфликта
+
+import { ProgressBar as UiProgressBar } from "../../components/ui/ProgressBar"; 
+import Button from "../../components/ui/new/Button"; 
 import { useProgressStore } from "../../stores/progressStore";
 import { useTelegramInit } from "../../hooks/useTelegramInit";
 
-// Типы для модулей и цветовых вариантов (из первого файла)
+
 interface Module {
   icon: React.ReactNode;
   title: string;
   description: string;
-  color: "primary" | "secondary" | "accent" | "warning" | "danger" | "info"; // Добавил 'info' на всякий случай
+  color: "primary" | "secondary" | "accent" | "warning" | "danger" | "info"; 
   to: string;
-  progressKey?: "vocab" | "grammar" | "conversation"; // Для связи с прогрессом
+  progressKey?: "vocab" | "grammar" | "conversation"; 
 }
 
 const colorVariants = {
@@ -57,14 +57,14 @@ const SpanishPage: React.FC = () => {
       description: "Learn by themes",
       color: "primary",
       to: "/spanish/topics",
-      // Можно добавить progressKey, если для тем есть отдельный трекинг
+    
     },
     {
-      icon: <MessageCircle size={24} />, // В первом файле это был Vocabulary, во втором - BookOpen. Использую иконку и название из первого файла для этого пункта.
+      icon: <MessageCircle size={24} />, 
       title: "Vocabulary",
       description: "Essential words & flashcards",
       color: "accent",
-      to: "/spanish/flashcards", // Путь из второго файла
+      to: "/spanish/flashcards", 
       progressKey: "vocab",
     },
     {
@@ -72,15 +72,15 @@ const SpanishPage: React.FC = () => {
       title: "Conversation",
       description: "Daily phrases",
       color: "secondary",
-      to: "/spanish/conversation", // Убедимся, что такой роут есть или будет
-      progressKey: "conversation", // Предполагаем, что есть такой ключ
+      to: "/spanish/conversation", 
+      progressKey: "conversation", 
     },
     {
       icon: <GraduationCap size={24} />,
       title: "Grammar",
       description: "Spanish tenses",
       color: "warning",
-      to: "/spanish/grammar", // Путь из второго файла
+      to: "/spanish/grammar", 
       progressKey: "grammar",
     },
     {
@@ -108,7 +108,7 @@ const SpanishPage: React.FC = () => {
     );
   }, [progress.spanish.grammarCompleted, progress.spanish.grammarTotal]);
 
-  // Пример для прогресса по разговорам, если он будет отслеживаться
+
   const percentConversation = useMemo(
     () => {
       // Заменить на реальные данные из useProgressStore, если они появятся
@@ -181,16 +181,16 @@ const SpanishPage: React.FC = () => {
           </h2>
           <div className="flex flex-col sm:flex-row gap-3">
             <Link to="/spanish/flashcards" className="flex-1">
-              <UiButton fullWidth variant="primary">
+              <Button fullWidth variant="primary">
                 {" "}
                 {/* Используем UiButton и его варианты */}
                 Start Flashcards
-              </UiButton>
+              </Button>
             </Link>
             <Link to="/spanish/grammar" className="flex-1">
-              <UiButton variant="outline" fullWidth>
+              <Button variant="outline" fullWidth>
                 Learn Grammar
-              </UiButton>
+              </Button>
             </Link>
           </div>
         </Card>
