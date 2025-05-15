@@ -10,6 +10,7 @@ import { useProgressStore } from "@/stores/progressStore";
 import { useTelegramRecognition } from "@/hooks/useTelegramRecognition";
 import { useTelegramInit } from "@/hooks/useTelegramInit";
 import { cn } from "@/lib/utils";
+import { Send, Mic, MicOff } from "lucide-react";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -44,6 +45,16 @@ export default function EnglishPage() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [showGptChat, setShowGptChat] = useState(false);
   const [hovered, setHovered] = useState<number | null>(null);
+  const [messages, setMessages] = useState<
+    Array<{ role: "user" | "assistant"; content: string }>
+  >([
+    {
+      role: "assistant",
+      content:
+        "Hello! I'm your IELTS speaking practice assistant. How can I help you today?",
+    },
+  ]);
+  const [inputMessage, setInputMessage] = useState("");
 
   const part1Questions = useMemo(
     () => ieltsQuestions.filter((q) => q.category === "part1"),
@@ -77,6 +88,24 @@ export default function EnglishPage() {
     updateEnglishProgress(newCompleted, progress.english.ieltsQuestionsTotal);
   };
 
+  const handleSendMessage = () => {
+    if (!inputMessage.trim()) return;
+
+    setMessages((prev) => [...prev, { role: "user", content: inputMessage }]);
+    setInputMessage("");
+
+    // Simulate AI response
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "That's a great question! Let me help you with that...",
+        },
+      ]);
+    }, 1000);
+  };
+
   useEffect(() => {
     document.title = "IELTS Preparation";
   }, []);
@@ -88,23 +117,23 @@ export default function EnglishPage() {
       questions: part1Questions,
       image:
         "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?ixlib=rb-4.0.3",
-      color: "from-blue-500/80 to-blue-600/80",
+      color: "from-[#012169]/80 to-[#012169]/90",
     },
     {
       title: "Part 2 – Long Turn",
       description: "Speak for 1–2 minutes on a topic",
       questions: part2Questions,
       image:
-        "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?ixlib=rb-4.0.3",
-      color: "from-purple-500/80 to-purple-600/80",
+        "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?ixlib=rb-4.0.3",
+      color: "from-[#C8102E]/80 to-[#C8102E]/90",
     },
     {
       title: "Part 3 – Discussion",
       description: "In-depth discussion related to Part 2",
       questions: part3Questions,
       image:
-        "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?ixlib=rb-4.0.3",
-      color: "from-green-500/80 to-green-600/80",
+        "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?ixlib=rb-4.0.3",
+      color: "from-[#012169]/80 to-[#012169]/90",
     },
   ];
 
@@ -113,10 +142,10 @@ export default function EnglishPage() {
       initial="hidden"
       animate="visible"
       variants={containerVariants}
-      className="min-h-screen bg-black text-white"
+      className="min-h-screen bg-[#012169] text-white"
     >
       <motion.div style={{ y }} className="relative overflow-hidden py-12">
-        <div className="absolute inset-0 bg-gradient-to-b from-black to-transparent opacity-50"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-[#012169] to-transparent opacity-50"></div>
         <div className="relative z-10 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -135,7 +164,7 @@ export default function EnglishPage() {
           {/* Progress Section */}
           <motion.div
             variants={itemVariants}
-            className="bg-white/5 backdrop-blur-lg rounded-2xl p-6"
+            className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 border border-white/10"
           >
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Your Progress</h2>
@@ -146,7 +175,7 @@ export default function EnglishPage() {
             </div>
             <div className="w-full h-2 bg-white/20 rounded-full overflow-hidden">
               <div
-                className="h-full bg-blue-500 rounded-full transition-all duration-500"
+                className="h-full bg-[#C8102E] rounded-full transition-all duration-500"
                 style={{ width: `${percentComplete}%` }}
               />
             </div>
@@ -168,9 +197,9 @@ export default function EnglishPage() {
                   onClick={() => setShowGptChat(true)}
                   fullWidth
                   variant="gradient"
-                  className="bg-gradient-to-r from-blue-500 to-purple-600"
+                  className="bg-gradient-to-r from-[#012169] to-[#C8102E] hover:from-[#C8102E] hover:to-[#012169]"
                 >
-                  Chat with AI Assistant
+                  Start Speaking Practice
                 </Button>
               </motion.div>
 
@@ -219,7 +248,7 @@ export default function EnglishPage() {
                               className={cn(
                                 "w-8 h-8 rounded-full text-sm flex items-center justify-center transition-all duration-300",
                                 completed
-                                  ? "bg-white text-black"
+                                  ? "bg-[#C8102E] text-white"
                                   : "bg-white/20 text-white"
                               )}
                             >
@@ -240,43 +269,64 @@ export default function EnglishPage() {
               className="h-[80vh] flex flex-col space-y-4"
             >
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-bold">AI Assistant</h2>
+                <h2 className="text-xl font-bold">IELTS Speaking Practice</h2>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setShowGptChat(false)}
+                  className="border-white/20 text-white hover:bg-white/10"
                 >
                   Back to Practice
                 </Button>
               </div>
 
-              <div className="flex-1 overflow-y-auto space-y-4">
-                <Card className="p-3 bg-white/5 backdrop-blur-lg">
-                  Hi there! How can I help with Part 2?
-                </Card>
-                <Card className="p-3 ml-auto bg-blue-500/20 backdrop-blur-lg">
-                  Try asking tips for Part 2.
-                </Card>
+              <div className="flex-1 overflow-y-auto space-y-4 p-4 bg-white/5 rounded-2xl backdrop-blur-lg">
+                {messages.map((message, index) => (
+                  <div
+                    key={index}
+                    className={cn(
+                      "flex",
+                      message.role === "assistant"
+                        ? "justify-start"
+                        : "justify-end"
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        "max-w-[80%] p-4 rounded-2xl",
+                        message.role === "assistant"
+                          ? "bg-white/10 text-white"
+                          : "bg-[#C8102E] text-white"
+                      )}
+                    >
+                      {message.content}
+                    </div>
+                  </div>
+                ))}
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex gap-2 p-4 bg-white/5 rounded-2xl backdrop-blur-lg">
                 <Button
                   onClick={toggleRecognition}
                   variant="outline"
-                  className="bg-white/10"
+                  className="bg-white/10 border-white/20 text-white hover:bg-white/20"
                 >
-                  {isRecognizing ? "Stop" : "Record"}
+                  {isRecognizing ? <MicOff size={20} /> : <Mic size={20} />}
                 </Button>
                 <input
                   type="text"
+                  value={inputMessage}
+                  onChange={(e) => setInputMessage(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
                   placeholder="Type your message…"
-                  className="flex-1 bg-white/10 border border-white/20 rounded-full px-4 py-2 text-white placeholder-white/50 focus:ring-2 focus:ring-blue-500"
+                  className="flex-1 bg-white/10 border border-white/20 rounded-full px-4 py-2 text-white placeholder-white/50 focus:ring-2 focus:ring-[#C8102E]"
                 />
                 <Button
+                  onClick={handleSendMessage}
                   variant="gradient"
-                  className="bg-gradient-to-r from-blue-500 to-purple-600"
+                  className="bg-gradient-to-r from-[#012169] to-[#C8102E] hover:from-[#C8102E] hover:to-[#012169]"
                 >
-                  Send
+                  <Send size={20} />
                 </Button>
               </div>
             </motion.div>
