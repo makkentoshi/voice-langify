@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+import { ArrowLeft, ChevronRight, BookOpen, Clock, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/new/Card";
 import { Button } from "@/components/ui/new/Button";
@@ -8,165 +9,185 @@ import { cn } from "@/lib/utils";
 
 const topics = [
   {
-    title: "Animals",
-    emoji: "🐾",
-    description: "Learn animal names and sounds",
-    color: "from-orange-500/80 to-orange-600/80",
-    image:
-      "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?ixlib=rb-4.0.3",
+    id: 1,
+    title: "Basic Greetings",
+    description: "Essential Spanish greetings and introductions",
+    level: "Beginner",
+    duration: "15 min",
     progress: 40,
+    icon: "👋",
   },
   {
+    id: 2,
     title: "Food & Drinks",
-    emoji: "🍔",
-    description: "Essential vocabulary for restaurants",
-    color: "from-red-500/80 to-red-600/80",
-    image:
-      "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?ixlib=rb-4.0.3",
+    description: "Order food and drinks in Spanish",
+    level: "Beginner",
+    duration: "20 min",
     progress: 60,
+    icon: "🍔",
   },
   {
-    title: "Travel",
-    emoji: "✈️",
-    description: "Useful phrases for travelers",
-    color: "from-blue-500/80 to-blue-600/80",
-    image:
-      "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?ixlib=rb-4.0.3",
+    id: 3,
+    title: "Travel Phrases",
+    description: "Essential phrases for travelers",
+    level: "Intermediate",
+    duration: "25 min",
     progress: 20,
+    icon: "✈️",
   },
   {
-    title: "Family",
-    emoji: "👨‍👩‍👧‍👦",
-    description: "Family members and relationships",
-    color: "from-purple-500/80 to-purple-600/80",
-    image:
-      "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?ixlib=rb-4.0.3",
+    id: 4,
+    title: "Family Members",
+    description: "Learn family-related vocabulary",
+    level: "Beginner",
+    duration: "15 min",
     progress: 80,
+    icon: "👨‍👩‍👧‍👦",
   },
   {
+    id: 5,
     title: "Shopping",
-    emoji: "🛍️",
     description: "Shopping vocabulary and phrases",
-    color: "from-green-500/80 to-green-600/80",
-    image:
-      "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?ixlib=rb-4.0.3",
+    level: "Intermediate",
+    duration: "20 min",
     progress: 30,
+    icon: "🛍️",
   },
   {
+    id: 6,
     title: "Weather",
-    emoji: "☁️",
     description: "Weather conditions and forecasts",
-    color: "from-yellow-500/80 to-yellow-600/80",
-    image:
-      "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?ixlib=rb-4.0.3",
+    level: "Beginner",
+    duration: "15 min",
     progress: 50,
+    icon: "☁️",
   },
 ];
 
 export default function TopicsPage() {
   useTelegramInit("#FFFFFFFF", false);
-  const [hovered, setHovered] = useState<number | null>(null);
+  const [selectedTopic, setSelectedTopic] = useState<number | null>(null);
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="min-h-screen bg-black text-white"
+      className="min-h-screen bg-[#F2F2F7]"
     >
-      <header className="relative overflow-hidden py-12">
-        <div className="absolute inset-0 bg-gradient-to-b from-black to-transparent opacity-50"></div>
-        <div className="relative z-10 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="flex items-center justify-center mb-8"
-          >
-            <span className="text-8xl mr-4">📚</span>
-            <h1 className="text-4xl font-bold text-white">Spanish Topics</h1>
-          </motion.div>
+      <header className="bg-white border-b border-gray-200">
+        <div className="max-w-2xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <Link to="/spanish" className="text-blue-500">
+              <ArrowLeft size={24} />
+            </Link>
+            <h1 className="text-xl font-semibold">Spanish Topics</h1>
+            <div className="w-6" />
+          </div>
         </div>
       </header>
 
-      <main className="px-4 py-8">
-        <div className="max-w-6xl mx-auto space-y-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {topics.map((topic, index) => (
-              <motion.div
-                key={topic.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                onMouseEnter={() => setHovered(index)}
-                onMouseLeave={() => setHovered(null)}
+      <main className="max-w-2xl mx-auto px-4 py-6">
+        <div className="space-y-3">
+          {topics.map((topic) => (
+            <motion.div
+              key={topic.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Card
                 className={cn(
-                  "relative rounded-2xl overflow-hidden h-[300px] transition-all duration-500",
-                  hovered !== null &&
-                    hovered !== index &&
-                    "blur-sm scale-[0.98]"
+                  "bg-white rounded-xl overflow-hidden",
+                  selectedTopic === topic.id && "ring-2 ring-blue-500"
                 )}
+                onClick={() => setSelectedTopic(topic.id)}
               >
-                <div
-                  className="absolute inset-0 bg-cover bg-center transition-transform duration-700"
-                  style={{
-                    backgroundImage: `url(${topic.image})`,
-                    transform: hovered === index ? "scale(1.1)" : "scale(1)",
-                  }}
-                />
-                <div
-                  className={cn(
-                    "absolute inset-0 bg-gradient-to-t",
-                    topic.color
-                  )}
-                />
-                <div className="absolute inset-0 flex flex-col items-center justify-center p-8">
-                  <span className="text-6xl mb-4">{topic.emoji}</span>
-                  <h3 className="text-2xl font-bold mb-2">{topic.title}</h3>
-                  <p className="text-lg opacity-90 mb-4 text-center">
-                    {topic.description}
-                  </p>
-                  <div className="w-full max-w-[200px] h-1 bg-white/30 rounded-full overflow-hidden mb-4">
-                    <div
-                      className="h-full bg-white rounded-full transition-all duration-500"
-                      style={{ width: `${topic.progress}%` }}
-                    />
+                <div className="p-4">
+                  <div className="flex items-start space-x-4">
+                    <div className="text-4xl">{topic.icon}</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-semibold text-gray-900 truncate">
+                          {topic.title}
+                        </h3>
+                        <ChevronRight className="text-gray-400" size={20} />
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">
+                        {topic.description}
+                      </p>
+                      <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
+                        <div className="flex items-center">
+                          <BookOpen className="w-4 h-4 mr-1" />
+                          <span>{topic.level}</span>
+                        </div>
+                        <div className="flex items-center">
+                          <Clock className="w-4 h-4 mr-1" />
+                          <span>{topic.duration}</span>
+                        </div>
+                        <div className="flex items-center">
+                          <Star className="w-4 h-4 mr-1" />
+                          <span>{topic.progress}%</span>
+                        </div>
+                      </div>
+                      <div className="mt-3 w-full h-1 bg-gray-100 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-blue-500 rounded-full transition-all duration-500"
+                          style={{ width: `${topic.progress}%` }}
+                        />
+                      </div>
+                    </div>
                   </div>
-                  <Button
-                    variant="gradient"
-                    className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-purple-500 hover:to-blue-500"
-                  >
-                    Start Learning
-                  </Button>
-                </div>
-              </motion.div>
-            ))}
-          </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-            className="mt-12 max-w-2xl mx-auto"
-          >
-            <Card className="bg-white/5 backdrop-blur-lg rounded-2xl p-6">
-              <h2 className="text-xl font-semibold mb-6">Learning Progress</h2>
-              <div className="space-y-4">
-                <div className="p-4 bg-white/10 rounded-lg">
-                  <h3 className="font-medium mb-2">Your Achievement</h3>
-                  <p className="text-white/80">
-                    You've completed 3 out of 6 topics. Keep going!
-                  </p>
+                  {selectedTopic === topic.id && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="mt-4 pt-4 border-t border-gray-100"
+                    >
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full text-blue-500 border-blue-500"
+                      >
+                        Continue Learning
+                      </Button>
+                    </motion.div>
+                  )}
                 </div>
-                <div className="p-4 bg-white/10 rounded-lg">
-                  <h3 className="font-medium mb-2">Next Goal</h3>
-                  <p className="text-white/80">
-                    Complete the Weather topic to unlock new vocabulary sets.
-                  </p>
-                </div>
-              </div>
-            </Card>
-          </motion.div>
+              </Card>
+            </motion.div>
+          ))}
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+          className="mt-8"
+        >
+          <Card className="bg-white rounded-xl p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              Learning Progress
+            </h2>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Overall Progress</span>
+                <span className="text-sm font-medium text-blue-500">65%</span>
+              </div>
+              <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-blue-500 rounded-full transition-all duration-500"
+                  style={{ width: "65%" }}
+                />
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-600">Topics Completed</span>
+                <span className="font-medium">4/6</span>
+              </div>
+            </div>
+          </Card>
+        </motion.div>
       </main>
     </motion.div>
   );

@@ -1,7 +1,13 @@
 // src/pages/spanish/GrammarPage.tsx
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, BookOpen, ChevronRight } from "lucide-react";
+import {
+  ArrowLeft,
+  MessageSquare,
+  ChevronRight,
+  ThumbsUp,
+  MessageCircle,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/new/Card";
 import { Button } from "@/components/ui/new/Button";
@@ -10,158 +16,171 @@ import { cn } from "@/lib/utils";
 
 const grammarTopics = [
   {
-    title: "Present Tense",
-    description: "Learn about regular and irregular verbs in present tense",
-    examples: ["Yo hablo español", "Tú comes frutas", "Él vive en Madrid"],
-    color: "from-blue-500/80 to-blue-600/80",
-    image:
-      "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?ixlib=rb-4.0.3",
-  },
-  {
-    title: "Past Tense",
-    description: "Master the preterite and imperfect tenses",
+    id: 1,
+    title: "Present Tense (Presente)",
+    description:
+      "Used to talk about habitual actions, general truths, and current states.",
+    author: "Maria Garcia",
+    replies: 24,
+    likes: 156,
+    lastActivity: "2h ago",
     examples: [
-      "Yo hablé con él ayer",
-      "Ella vivía en Barcelona",
-      "Nosotros comimos paella",
+      {
+        spanish: "Yo hablo español.",
+        english: "I speak Spanish.",
+      },
+      {
+        spanish: "Ella vive en Madrid.",
+        english: "She lives in Madrid.",
+      },
     ],
-    color: "from-purple-500/80 to-purple-600/80",
-    image:
-      "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?ixlib=rb-4.0.3",
   },
   {
-    title: "Future Tense",
-    description: "Learn to express future actions and plans",
-    examples: ["Yo hablaré español", "Tú comerás paella", "Ellos vivirán aquí"],
-    color: "from-green-500/80 to-green-600/80",
-    image:
-      "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?ixlib=rb-4.0.3",
-  },
-  {
-    title: "Subjunctive Mood",
-    description: "Understand when and how to use the subjunctive",
+    id: 2,
+    title: "Past Tense (Pretérito)",
+    description: "Used to talk about completed actions in the past.",
+    author: "Carlos Rodriguez",
+    replies: 18,
+    likes: 98,
+    lastActivity: "5h ago",
     examples: [
-      "Espero que hables español",
-      "Quiero que comas frutas",
-      "Dudo que viva aquí",
+      {
+        spanish: "Yo hablé con él ayer.",
+        english: "I spoke with him yesterday.",
+      },
+      {
+        spanish: "Ella compró un libro.",
+        english: "She bought a book.",
+      },
     ],
-    color: "from-red-500/80 to-red-600/80",
-    image:
-      "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?ixlib=rb-4.0.3",
+  },
+  {
+    id: 3,
+    title: "Imperfect Tense (Imperfecto)",
+    description: "Used to describe ongoing or habitual actions in the past.",
+    author: "Ana Martinez",
+    replies: 32,
+    likes: 210,
+    lastActivity: "1d ago",
+    examples: [
+      {
+        spanish: "Yo hablaba con él todos los días.",
+        english: "I used to speak with him every day.",
+      },
+      {
+        spanish: "Cuando era niño, jugaba al fútbol.",
+        english: "When I was a child, I used to play soccer.",
+      },
+    ],
   },
 ];
 
 export default function GrammarPage() {
   useTelegramInit("#FFFFFFFF", false);
-  const [hovered, setHovered] = useState<number | null>(null);
+  const [selectedTopic, setSelectedTopic] = useState<number | null>(null);
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="min-h-screen bg-black text-white"
+      className="min-h-screen bg-[#F2F2F7]"
     >
-      <header className="relative overflow-hidden py-12">
-        <div className="absolute inset-0 bg-gradient-to-b from-black to-transparent opacity-50"></div>
-        <div className="relative z-10 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="flex items-center justify-center mb-8"
-          >
-            <span className="text-8xl mr-4">📚</span>
-            <h1 className="text-4xl font-bold text-white">Spanish Grammar</h1>
-          </motion.div>
+      <header className="bg-white border-b border-gray-200">
+        <div className="max-w-4xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <Link to="/spanish" className="text-blue-500">
+              <ArrowLeft size={24} />
+            </Link>
+            <h1 className="text-xl font-semibold">Grammar Forum</h1>
+            <div className="w-6" />
+          </div>
         </div>
       </header>
 
-      <main className="px-4 py-8">
-        <div className="max-w-6xl mx-auto space-y-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {grammarTopics.map((topic, index) => (
-              <motion.div
-                key={topic.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                onMouseEnter={() => setHovered(index)}
-                onMouseLeave={() => setHovered(null)}
+      <main className="max-w-4xl mx-auto px-4 py-6">
+        <div className="space-y-4">
+          {grammarTopics.map((topic) => (
+            <motion.div
+              key={topic.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Card
                 className={cn(
-                  "relative rounded-2xl overflow-hidden h-[400px] transition-all duration-500",
-                  hovered !== null &&
-                    hovered !== index &&
-                    "blur-sm scale-[0.98]"
+                  "bg-white rounded-xl overflow-hidden",
+                  selectedTopic === topic.id && "ring-2 ring-blue-500"
                 )}
+                onClick={() => setSelectedTopic(topic.id)}
               >
-                <div
-                  className="absolute inset-0 bg-cover bg-center transition-transform duration-700"
-                  style={{
-                    backgroundImage: `url(${topic.image})`,
-                    transform: hovered === index ? "scale(1.1)" : "scale(1)",
-                  }}
-                />
-                <div
-                  className={cn(
-                    "absolute inset-0 bg-gradient-to-t",
-                    topic.color
-                  )}
-                />
-                <div className="absolute inset-0 flex flex-col items-center justify-center p-8">
-                  <div className="text-4xl mb-4">
-                    <BookOpen className="w-12 h-12" />
-                  </div>
-                  <h3 className="text-2xl font-bold mb-2">{topic.title}</h3>
-                  <p className="text-lg opacity-90 mb-4 text-center">
-                    {topic.description}
-                  </p>
-                  <div className="space-y-2 mb-6">
-                    {topic.examples.map((example, i) => (
-                      <p
-                        key={i}
-                        className="text-sm bg-white/10 px-4 py-2 rounded-lg"
-                      >
-                        {example}
+                <div className="p-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                        {topic.title}
+                      </h3>
+                      <p className="text-sm text-gray-600 mb-3">
+                        {topic.description}
                       </p>
-                    ))}
+                      <div className="flex items-center space-x-4 text-sm text-gray-500">
+                        <div className="flex items-center">
+                          <MessageSquare className="w-4 h-4 mr-1" />
+                          <span>{topic.replies}</span>
+                        </div>
+                        <div className="flex items-center">
+                          <ThumbsUp className="w-4 h-4 mr-1" />
+                          <span>{topic.likes}</span>
+                        </div>
+                        <span>{topic.lastActivity}</span>
+                      </div>
+                    </div>
+                    <ChevronRight className="text-gray-400" size={20} />
                   </div>
-                  <Button
-                    variant="gradient"
-                    className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-purple-500 hover:to-blue-500"
-                  >
-                    Learn More
-                  </Button>
-                </div>
-              </motion.div>
-            ))}
-          </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-            className="mt-12 max-w-2xl mx-auto"
-          >
-            <Card className="bg-white/5 backdrop-blur-lg rounded-2xl p-6">
-              <h2 className="text-xl font-semibold mb-6">Quick Tips</h2>
-              <div className="space-y-4">
-                <div className="p-4 bg-white/10 rounded-lg">
-                  <h3 className="font-medium mb-2">Remember!</h3>
-                  <p className="text-white/80">
-                    Spanish verbs change their endings based on the subject and
-                    tense. Practice regularly to master the patterns.
-                  </p>
+                  {selectedTopic === topic.id && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="mt-4 pt-4 border-t border-gray-100"
+                    >
+                      <div className="space-y-3">
+                        {topic.examples.map((example, index) => (
+                          <div
+                            key={index}
+                            className="bg-gray-50 rounded-lg p-3 text-sm"
+                          >
+                            <p className="text-gray-900 font-medium mb-1">
+                              {example.spanish}
+                            </p>
+                            <p className="text-gray-600">{example.english}</p>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-4 flex items-center space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-blue-500 border-blue-500"
+                        >
+                          <ThumbsUp className="w-4 h-4 mr-1" />
+                          Like
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-gray-500 border-gray-300"
+                        >
+                          <MessageCircle className="w-4 h-4 mr-1" />
+                          Reply
+                        </Button>
+                      </div>
+                    </motion.div>
+                  )}
                 </div>
-                <div className="p-4 bg-white/10 rounded-lg">
-                  <h3 className="font-medium mb-2">Pro Tip</h3>
-                  <p className="text-white/80">
-                    Create flashcards for irregular verbs and review them daily
-                    to improve your grammar skills.
-                  </p>
-                </div>
-              </div>
-            </Card>
-          </motion.div>
+              </Card>
+            </motion.div>
+          ))}
         </div>
       </main>
     </motion.div>
