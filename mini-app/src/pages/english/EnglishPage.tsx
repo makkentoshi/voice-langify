@@ -118,6 +118,7 @@ export default function EnglishPage() {
       image:
         "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?ixlib=rb-4.0.3",
       color: "from-[#012169]/80 to-[#012169]/90",
+      to: "/english/part1",
     },
     {
       title: "Part 2 – Long Turn",
@@ -126,6 +127,7 @@ export default function EnglishPage() {
       image:
         "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?ixlib=rb-4.0.3",
       color: "from-[#C8102E]/80 to-[#C8102E]/90",
+      to: "/english/part2",
     },
     {
       title: "Part 3 – Discussion",
@@ -134,6 +136,7 @@ export default function EnglishPage() {
       image:
         "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?ixlib=rb-4.0.3",
       color: "from-[#012169]/80 to-[#012169]/90",
+      to: "/english/part3",
     },
   ];
 
@@ -206,59 +209,73 @@ export default function EnglishPage() {
               {/* IELTS Sections */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {sections.map((section, index) => (
-                  <motion.div
-                    key={section.title}
-                    variants={itemVariants}
-                    onMouseEnter={() => setHovered(index)}
-                    onMouseLeave={() => setHovered(null)}
-                    className={cn(
-                      "relative rounded-2xl overflow-hidden h-[300px] transition-all duration-500",
-                      hovered !== null &&
-                        hovered !== index &&
-                        "blur-sm scale-[0.98]"
-                    )}
-                  >
-                    <div
-                      className="absolute inset-0 bg-cover bg-center transition-transform duration-700"
-                      style={{
-                        backgroundImage: `url(${section.image})`,
-                        transform:
-                          hovered === index ? "scale(1.1)" : "scale(1)",
-                      }}
-                    />
-                    <div
+                  <Link to={section.to} key={section.title}>
+                    <motion.div
+                      variants={itemVariants}
+                      onMouseEnter={() => setHovered(index)}
+                      onMouseLeave={() => setHovered(null)}
                       className={cn(
-                        "absolute inset-0 bg-gradient-to-t",
-                        section.color
+                        "relative rounded-2xl overflow-hidden h-[300px] transition-all duration-500",
+                        hovered !== null &&
+                          hovered !== index &&
+                          "blur-sm scale-[0.98]"
                       )}
-                    />
-                    <div className="absolute inset-0 flex flex-col items-center justify-center p-8">
-                      <h3 className="text-2xl font-bold mb-2">
-                        {section.title}
-                      </h3>
-                      <p className="text-lg opacity-90 mb-4 text-center">
-                        {section.description}
-                      </p>
-                      <div className="flex flex-wrap gap-2 justify-center">
-                        {section.questions.map((q, qIdx) => {
-                          const completed = qIdx <= currentQuestionIndex;
-                          return (
-                            <span
-                              key={q.id}
-                              className={cn(
-                                "w-8 h-8 rounded-full text-sm flex items-center justify-center transition-all duration-300",
-                                completed
-                                  ? "bg-[#C8102E] text-white"
-                                  : "bg-white/20 text-white"
-                              )}
-                            >
-                              {qIdx + 1}
-                            </span>
-                          );
-                        })}
+                    >
+                      <div
+                        className="absolute inset-0 bg-cover bg-center transition-transform duration-700"
+                        style={{
+                          backgroundImage: `url(${section.image})`,
+                          transform:
+                            hovered === index ? "scale(1.1)" : "scale(1)",
+                        }}
+                      />
+                      <div
+                        className={cn(
+                          "absolute inset-0 bg-gradient-to-t",
+                          section.color
+                        )}
+                      />
+                      <div className="absolute inset-0 flex flex-col items-center justify-center p-8">
+                        <h3 className="text-2xl font-bold mb-2">
+                          {section.title}
+                        </h3>
+                        <p className="text-lg opacity-90 mb-4 text-center">
+                          {section.description}
+                        </p>
+                        <div className="flex flex-wrap gap-2 justify-center">
+                          {section.questions.map((q, qIdx) => {
+                            const completed = qIdx <= currentQuestionIndex;
+                            return (
+                              <span
+                                key={q.id}
+                                className={cn(
+                                  "w-8 h-8 rounded-full text-sm flex items-center justify-center transition-all duration-300",
+                                  completed
+                                    ? "bg-[#C8102E] text-white"
+                                    : "bg-white/20 text-white"
+                                )}
+                              >
+                                {qIdx + 1}
+                              </span>
+                            );
+                          })}
+                        </div>
+                        <motion.div
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: hovered === index ? 1 : 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="mt-4"
+                        >
+                          <Button
+                            variant="gradient"
+                            className="bg-gradient-to-r from-[#012169] to-[#C8102E] hover:from-[#C8102E] hover:to-[#012169]"
+                          >
+                            Explore Topics
+                          </Button>
+                        </motion.div>
                       </div>
-                    </div>
-                  </motion.div>
+                    </motion.div>
+                  </Link>
                 ))}
               </div>
             </>
