@@ -3,9 +3,8 @@ import React, { useMemo } from "react"; // Убрали useState, если activ
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
+import PageTransition from "@/components/ui/PageTransition";
 
-import PageTransition from "@/components/ui/PageTransition"; 
-import Card from "@/components/ui/new/Card"; 
 import {
   BookOpen,
   MessageCircle,
@@ -13,24 +12,23 @@ import {
   Gamepad2,
   GraduationCap,
   ChevronRight,
-  ArrowLeft, 
+  ArrowLeft,
   MessageSquare,
 } from "lucide-react";
 
-
-import { ProgressBar as UiProgressBar } from "../../components/ui/ProgressBar"; 
-import Button from "../../components/ui/new/Button"; 
+import { ProgressBar as UiProgressBar } from "../../components/ui/ProgressBar";
+import { Button } from "@/components/ui/new/Button";
+import {Card} from "@/components/ui/new/Card";
 import { useProgressStore } from "../../stores/progressStore";
 import { useTelegramInit } from "../../hooks/useTelegramInit";
-
 
 interface Module {
   icon: React.ReactNode;
   title: string;
   description: string;
-  color: "primary" | "secondary" | "accent" | "warning" | "danger" | "info"; 
+  color: "primary" | "secondary" | "accent" | "warning" | "danger" | "info";
   to: string;
-  progressKey?: "vocab" | "grammar" | "conversation"; 
+  progressKey?: "vocab" | "grammar" | "conversation";
 }
 
 const colorVariants = {
@@ -57,14 +55,13 @@ const SpanishPage: React.FC = () => {
       description: "Learn by themes",
       color: "primary",
       to: "/spanish/topics",
-    
     },
     {
-      icon: <MessageCircle size={24} />, 
+      icon: <MessageCircle size={24} />,
       title: "Vocabulary",
       description: "Essential words & flashcards",
       color: "accent",
-      to: "/spanish/flashcards", 
+      to: "/spanish/flashcards",
       progressKey: "vocab",
     },
     {
@@ -72,15 +69,15 @@ const SpanishPage: React.FC = () => {
       title: "Conversation",
       description: "Daily phrases",
       color: "secondary",
-      to: "/spanish/conversation", 
-      progressKey: "conversation", 
+      to: "/spanish/conversation",
+      progressKey: "conversation",
     },
     {
       icon: <GraduationCap size={24} />,
       title: "Grammar",
       description: "Spanish tenses",
       color: "warning",
-      to: "/spanish/grammar", 
+      to: "/spanish/grammar",
       progressKey: "grammar",
     },
     {
@@ -107,7 +104,6 @@ const SpanishPage: React.FC = () => {
       (progress.spanish.grammarCompleted / progress.spanish.grammarTotal) * 100
     );
   }, [progress.spanish.grammarCompleted, progress.spanish.grammarTotal]);
-
 
   const percentConversation = useMemo(
     () => {

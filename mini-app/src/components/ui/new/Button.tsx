@@ -1,57 +1,57 @@
-import React from "react";
-import { motion, HTMLMotionProps } from "framer-motion";
+import React from 'react';
+import { motion } from 'framer-motion';
 
-type ButtonVariant = "primary" | "secondary" | "outline" | "text";
-type ButtonSize = "sm" | "md" | "lg";
-
-interface ButtonProps extends Omit<HTMLMotionProps<"button">, "children"> {
-  variant?: ButtonVariant;
-  size?: ButtonSize;
-  icon?: React.ReactNode;
-  iconPosition?: "left" | "right";
-  fullWidth?: boolean;
+interface ButtonProps {
   children: React.ReactNode;
+  onClick?: () => void;
+  variant?: 'primary' | 'secondary' | 'outline' | 'gradient';
+  size?: 'sm' | 'md' | 'lg';
+  disabled?: boolean;
+  fullWidth?: boolean;
+  className?: string;
+  icon?: React.ReactNode;
 }
 
-const Button: React.FC<ButtonProps> = ({
-  variant = "primary",
-  size = "md",
-  icon,
-  iconPosition = "left",
-  fullWidth = false,
+export const Button: React.FC<ButtonProps> = ({
   children,
-  className = "",
-  ...props
+  onClick,
+  variant = 'primary',
+  size = 'md',
+  disabled = false,
+  fullWidth = false,
+  className = '',
+  icon,
 }) => {
-  const baseClasses =
-    "font-semibold rounded-full transition-all duration-200 focus:outline-none flex items-center justify-center";
-
-  const variantClasses = {
-    primary: "bg-primary-500 text-white active:bg-primary-600",
-    secondary: "bg-gray-200 text-gray-800 active:bg-gray-300",
-    outline: "border border-primary-500 text-primary-500 active:bg-primary-50",
-    text: "text-primary-500 hover:bg-primary-50 active:bg-primary-100",
+  const baseStyles = 'rounded-full font-medium flex items-center justify-center gap-2 transition-all duration-300';
+  
+  const variantStyles = {
+    primary: 'bg-blue-500 text-white hover:bg-blue-600 active:bg-blue-700',
+    secondary: 'bg-green-500 text-white hover:bg-green-600 active:bg-green-700',
+    outline: 'bg-transparent border border-blue-500 text-blue-500 hover:bg-blue-50 active:bg-blue-100',
+    gradient: 'bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 active:from-blue-700 active:to-purple-800',
   };
-
-  const sizeClasses = {
-    sm: "text-sm py-2 px-4",
-    md: "text-base py-3 px-6",
-    lg: "text-lg py-4 px-8",
+  
+  const sizeStyles = {
+    sm: 'text-sm py-1.5 px-3',
+    md: 'text-base py-2 px-4',
+    lg: 'text-lg py-2.5 px-5',
   };
-
-  const widthClass = fullWidth ? "w-full" : "";
-
+  
+  const widthStyles = fullWidth ? 'w-full' : '';
+  const disabledStyles = disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer';
+  
+  const combinedStyles = `${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${widthStyles} ${disabledStyles} ${className}`;
+  
   return (
     <motion.button
-      className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${widthClass} ${className}`}
-      whileTap={{ scale: 0.98 }}
-      {...props}
+      onClick={onClick}
+      disabled={disabled}
+      className={combinedStyles}
+      whileTap={{ scale: disabled ? 1 : 0.95 }}
+      whileHover={{ scale: disabled ? 1 : 1.02 }}
     >
-      {icon && iconPosition === "left" && <span className="mr-2">{icon}</span>}
+      {icon && <span>{icon}</span>}
       {children}
-      {icon && iconPosition === "right" && <span className="ml-2">{icon}</span>}
     </motion.button>
   );
 };
-
-export default Button;

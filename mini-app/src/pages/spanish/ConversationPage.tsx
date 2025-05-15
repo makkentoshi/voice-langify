@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import PageTransition from "@/components/ui/PageTransition";
-import Card from "@/components/ui/new/Card";
+import { Card } from "@/components/ui/new/Card";
 import { ChevronLeft, Volume2 } from "lucide-react";
 
 // Conversation phrases
