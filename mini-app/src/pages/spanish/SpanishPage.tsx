@@ -160,7 +160,7 @@ const SpanishPage: React.FC = () => {
           className="flex items-center justify-between mb-6" // justify-between для кнопки назад
         >
           <div className="flex items-center">
-            <span className="text-4xl mr-3">🇪🇸</span>
+            <span className="text-4xl mr-3">🇪🇸</span> 
             <h1 className="text-2xl font-bold">Spanish Learning</h1>{" "}
             {/* Название из второго файла */}
           </div>

@@ -21,12 +21,12 @@ const BottomBar: React.FC = () => {
     {
       to: '/english',
       label: 'English',
-      icon: <GraduationCap size={24} />,
+      icon: <span className="text-4xl mr-3">🇬🇧</span> ,
     },
     {
       to: '/spanish',
       label: 'Spanish',
-      icon: <Flag size={24} />,
+      icon: <span className="text-4xl mr-3">🇪🇸</span> 
     },
     {
       to: '/profile',
