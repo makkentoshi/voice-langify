@@ -51,7 +51,7 @@ const BottomBar: React.FC = () => {
               {isActive && (
                 <motion.div
                   layoutId="tab-indicator"
-                  className="absolute inset-0 bg-primary-100 rounded-full -z-10"
+                  className="absolute inset-0 bg-primary-100 rounded-full -z-10 text-white"
                   initial={false}
                   transition={{ type: "spring", stiffness: 500, damping: 30 }}
                 />

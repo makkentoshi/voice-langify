@@ -151,7 +151,7 @@ const SpanishPage: React.FC = () => {
             className="flex items-center justify-center mb-8"
           >
             <span className="text-8xl mr-4">🇪🇸</span>
-            <h1 className="text-4xl font-bold">Spanish Learning</h1>
+            <h1 className="text-4xl font-bold text-white">Spanish Learning</h1>
           </motion.div>
         </div>
       </motion.div>
