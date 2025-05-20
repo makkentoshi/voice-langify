@@ -1,24 +1,16 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import bodyParser from 'body-parser';
 import axios from 'axios';
-import mongoose from 'mongoose';
 import { z } from 'zod';
 
-// Подключение к MongoDB
-const MONGODB_URI = process.env.MONGODB_URI || 'YOUR_MONGODB_CONNECTION_STRING';
+// Импорт клиента Upstash Redis
+import { Redis } from '@upstash/redis';
 
-mongoose.connect(MONGODB_URI)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('MongoDB connection error:', err));
-
-// Определение базовой схемы пользователя (пример)
-const userSchema = new mongoose.Schema({
-  telegramId: { type: Number, required: true, unique: true },
-  // Добавьте другие поля пользователя, если необходимо
-});
-
-const User = mongoose.model('User', userSchema);
+// Инициализация клиента Redis с использованием переменных окружения от Vercel
+// Vercel автоматически предоставит UPSTASH_REDIS_URL и UPSTASH_REDIS_TOKEN
+// после добавления интеграции Upstash Redis из Marketplace
+const redis = Redis.fromEnv();
 
 // Zod схемы для валидации
 const generatePhraseSchema = z.object({
@@ -39,18 +31,22 @@ const telegramUpdateSchema = z.object({
     web_app_data: z.object({
       data: z.string(),
     }).optional(),
-    // Добавьте другие поля сообщения, если необходимо
   }).optional(),
-  // Добавьте другие типы обновлений, если необходимо (callback_query, inline_query и т.д.)
 });
 
+// Определение схемы для хранения фраз в KV
+const phraseSchema = z.object({
+  spanish: z.string(),
+  english: z.string(),
+  note: z.string().optional(),
+});
 
 // Инициализация Express приложения для Vercel
 const app = express();
 app.use(bodyParser.json());
 
-// Настройка CORS (базовая)
-app.use((req, res, next) => {
+// Настройка CORS
+app.use((req: Request, res: Response, next: NextFunction) => {
   res.setHeader('Access-Control-Allow-Origin', '*'); // В продакшене замените '*' на домен вашего мини-приложения
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -60,15 +56,19 @@ app.use((req, res, next) => {
   next();
 });
 
-// Эндпоинт для генерации испанской фразы
+// ЭНДПОИНТ: Генерация испанской фразы с использованием DeepSeek
 app.post('/api/generate-spanish-phrase', async (req: VercelRequest, res: VercelResponse) => {
   try {
-    // Валидация входных данных
     const { prompt } = generatePhraseSchema.parse(req.body);
 
-    // Запрос к DeepSeek API
     const deepseekApiKey = process.env.DEEPSEEK_API_KEY;
-    const deepseekApiEndpoint = 'https://api.deepseek.com/chat/completions'; // Актуальный эндпоинт DeepSeek
+    const deepseekApiEndpoint = 'https://api.deepseek.com/chat/completions';
+
+    if (!deepseekApiKey) {
+      console.error('DeepSeek API key is not configured.');
+      return res.status(500).json({ error: 'DeepSeek API key is not configured on the server.' });
+    }
+
     const response = await axios.post(deepseekApiEndpoint, {
       model: "deepseek-chat", // Используйте актуальную модель DeepSeek
       messages: [
@@ -78,7 +78,6 @@ app.post('/api/generate-spanish-phrase', async (req: VercelRequest, res: VercelR
       temperature: 0.7,
       max_tokens: 100,
       stream: false,
-      // Добавьте другие параметры DeepSeek API, если необходимо
     }, {
       headers: {
         'Content-Type': 'application/json',
@@ -86,14 +85,16 @@ app.post('/api/generate-spanish-phrase', async (req: VercelRequest, res: VercelR
       },
     });
 
-    // Обработка и валидация ответа от DeepSeek
     const generatedText = response.data?.choices?.[0]?.message?.content?.trim() || '';
 
     if (!generatedText) {
-         throw new Error('DeepSeek API returned no generated text.');
+         console.error('DeepSeek API returned no generated text. Response data:', response.data);
+         // Попытка извлечь сообщение об ошибке из ответа DeepSeek, если оно есть
+         const deepseekError = response.data?.error?.message || 'DeepSeek API returned no generated text.';
+         throw new Error(`DeepSeek generation failed: ${deepseekError}`);
     }
 
-    // Валидация выходных данных (можно адаптировать под формат DeepSeek)
+    // Валидация выходных данных (опционально)
     // const { phrase } = generatedPhraseResponseSchema.parse({ phrase: generatedText });
 
     res.status(200).json({ phrase: generatedText });
@@ -104,32 +105,112 @@ app.post('/api/generate-spanish-phrase', async (req: VercelRequest, res: VercelR
     if (error instanceof z.ZodError) {
       res.status(400).json({ error: 'Invalid input data', details: error.errors });
     } else if (error.response) {
-      // Ошибки от DeepSeek API
-      res.status(error.response.status).json({ error: error.response.data });
-    }
-     else {
-      res.status(500).json({ error: 'Failed to generate Spanish phrase' });
+      // Логгируем полный ответ DeepSeek в случае ошибки
+      console.error('DeepSeek API error response:', error.response.data);
+      // Пытаемся вернуть сообщение об ошибке от DeepSeek пользователю
+      const deepseekErrorMessage = error.response.data?.error?.message || error.response.data || 'DeepSeek API error';
+      res.status(error.response.status).json({ error: deepseekErrorMessage });
+    } else {
+      res.status(500).json({ error: error.message || 'Failed to generate Spanish phrase' });
     }
   }
 });
 
-// Эндпоинт вебхука Telegram
+// ЭНДПОИНТ: Получение фраз по теме из KV
+app.get('/api/spanish-phrases/:topicId', async (req: VercelRequest, res: VercelResponse) => {
+    try {
+        const topicId = req.query.topicId;
+
+        if (!topicId || typeof topicId !== 'string') {
+            return res.status(400).json({ error: 'Missing or invalid topicId' });
+        }
+
+        // Ключ в KV для списка фраз по данной теме
+        const kvKey = `spanish:phrases:topic:${topicId}`;
+
+        // Получаем данные из Redis по ключу (ожидаем массив JSON объектов)
+        const phrases = await redis.json.get(kvKey) as z.infer<typeof phraseSchema>[] | null;
+
+        if (!phrases) {
+            // Если данные не найдены, возвращаем пустой массив
+            return res.status(200).json({ phrases: [] });
+        }
+
+        // Валидируем полученные данные (опционально, но рекомендуется)
+        // Это поможет поймать ошибки, если формат данных в базе неправильный
+        try {
+           const validatedPhrases = z.array(phraseSchema).parse(phrases);
+           res.status(200).json({ phrases: validatedPhrases });
+        } catch (zodError: any) {
+           console.error('Data in KV does not match schema:', zodError);
+           // Возвращаем ошибку сервера, так как формат данных неверный
+           res.status(500).json({ error: 'Data in database has an invalid format.' });
+        }
+
+
+    } catch (error: any) {
+        console.error('Error fetching Spanish phrases:', error);
+        res.status(500).json({ error: error.message || 'Failed to fetch Spanish phrases' });
+    }
+});
+
+// ЭНДПОИНТ (ПРИМЕР): Добавление фраз в базу данных KV
+// ВНИМАНИЕ: Этот эндпоинт не должен быть доступен публично в продакшене без аутентификации!
+// Используйте его только для первоначального наполнения базы данных или через защищенный канал.
+app.post('/api/add-spanish-phrases', async (req: VercelRequest, res: VercelResponse) => {
+     try {
+        // Схема для валидации массива фраз, отправляемых для добавления
+        const addPhrasesSchema = z.object({
+             topicId: z.string(),
+             phrases: z.array(phraseSchema)
+        });
+
+        const { topicId, phrases } = addPhrasesSchema.parse(req.body);
+
+        const kvKey = `spanish:phrases:topic:${topicId}`;
+
+        // Получаем текущие фразы (если есть). Используем redis.json.get для JSON-данных.
+        const currentPhrases = await redis.json.get(kvKey) as z.infer<typeof phraseSchema>[] | null;
+
+        // Объединяем существующие фразы с новыми
+        // Здесь можно добавить логику для избегания дубликатов, если необходимо
+        const updatedPhrases = currentPhrases ? [...currentPhrases, ...phrases] : phrases;
+
+        // Сохраняем обновленный массив фраз в Redis.
+        // $. - это путь в JSONPath, означает корень документа.
+        await redis.json.set(kvKey, '$', updatedPhrases);
+
+        res.status(200).json({ message: 'Phrases added successfully', count: phrases.length });
+
+     } catch (error: any) {
+        console.error('Error adding Spanish phrases:', error);
+         if (error instanceof z.ZodError) {
+             res.status(400).json({ error: 'Invalid input data for adding phrases', details: error.errors });
+        } else {
+             res.status(500).json({ error: error.message || 'Failed to add Spanish phrases' });
+        }
+     }
+});
+
+
+// ЭНДПОИНТ: Вебхук Telegram
 app.post('/api/webhook', async (req: VercelRequest, res: VercelResponse) => {
   try {
-    // Валидация входящего обновления Telegram
     const update = telegramUpdateSchema.parse(req.body);
-    console.log('Received update:', update);
+    // console.log('Received update:', JSON.stringify(update, null, 2)); // Логгируем полное обновление для отладки
 
     if (update.message) {
       const chatId = update.message.chat.id;
 
-      // Пример обработки команды /start
       if (update.message.text === '/start') {
         console.log(`Received /start command from chat ${chatId}`);
-        // Отправка сообщения с кнопкой для открытия TMA
-        // Вам нужно будет использовать Telegram Bot API для этого
         const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN;
-        const webAppUrl = 'YOUR_VERCEL_BOT_URL'; // Замените на ваш URL
+        const webAppUrl = process.env.VERCEL_BOT_URL || 'YOUR_VERCEL_BOT_URL'; // Используем переменную окружения или плейсхолдер
+
+        if (!telegramBotToken) {
+             console.error('TELEGRAM_BOT_TOKEN is not configured.');
+             return res.status(200).send('Bot token not configured'); // Всегда отвечаем 200 для Telegram
+        }
 
         await axios.post(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
           chat_id: chatId,
@@ -142,56 +223,54 @@ app.post('/api/webhook', async (req: VercelRequest, res: VercelResponse) => {
         });
       }
 
-      // Пример обработки данных из Web App
       if (update.message.web_app_data) {
         const webAppData = update.message.web_app_data.data;
         console.log('Received data from Web App:', webAppData);
 
-        // Здесь вы можете обработать данные из TMA
-        // Например, сохранить их в базу данных, используя Mongoose
+        // Пример обработки данных из TMA и сохранения в KV (адаптируйте под ваши нужды)
         try {
-            // Пример сохранения данных в MongoDB (адаптируйте под ваши нужды)
-            // const newData = JSON.parse(webAppData); // Если данные в формате JSON
-            // const user = await User.findOneAndUpdate(
-            //     { telegramId: chatId },
-            //     { $set: { someField: newData.someValue } }, // Обновите поля
-            //     { upsert: true, new: true }
-            // );
-            // console.log('User data updated:', user);
-        } catch (dbError) {
+            // Предположим, webAppData - это JSON строка с данными пользователя
+            // const userData = JSON.parse(webAppData);
+            // const userKvKey = `user:${chatId}`;
+            // await redis.json.set(userKvKey, '$', userData); // Сохраняем JSON данные пользователя
+            // console.log('User data saved to KV for chat ID:', chatId);
+
+        } catch (dbError: any) {
             console.error('Database error processing web app data:', dbError);
             // Обработайте ошибку базы данных
         }
 
-
-        // Опционально: отправить подтверждение в чат
-         await axios.post(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
-             chat_id: chatId,
-             text: 'Data from Mini App received successfully!',
-         });
+         // Опционально: отправить подтверждение в чат
+         // Убедитесь, что TELEGRAM_BOT_TOKEN доступен здесь
+         if (process.env.TELEGRAM_BOT_TOKEN) {
+             await axios.post(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                 chat_id: chatId,
+                 text: 'Data from Mini App received successfully!',
+             });
+         } else {
+             console.error('TELEGRAM_BOT_TOKEN is not configured for sending confirmation.');
+         }
       }
     }
 
-    // Всегда отвечаем 200 OK на вебхуки Telegram, чтобы избежать повторных отправок
-    res.status(200).send('OK');
+    res.status(200).send('OK'); // Всегда отвечаем 200 OK на вебхуки Telegram
 
   } catch (error: any) {
     console.error('Error processing Telegram update:', error);
 
     if (error instanceof z.ZodError) {
-      // Не отправляйте детали Zod ошибок обратно Telegram, просто логгируйте
       console.error('Invalid Telegram update data:', error.errors);
       res.status(200).send('Invalid update data'); // Всегда 200 для Telegram
     } else if (error.response && error.response.config && error.response.config.url.includes('api.telegram.org')) {
-         // Ошибки при отправке сообщений через Telegram Bot API
          console.error('Telegram Bot API error:', error.response.data);
          res.status(200).send('Telegram API error'); // Всегда 200 для Telegram
-    }
-     else {
+    } else {
       res.status(200).send('Internal server error'); // Всегда 200 для Telegram
     }
   }
 });
 
+
 // Точка входа Vercel
+// Экспортируем Express приложение
 export default app;
