@@ -15,6 +15,7 @@ import GrammarPage from "@/pages/spanish/GrammarPage";
 import GamePage from "@/pages/spanish/GamePage";
 import FlashcardsPage from "@/pages/spanish/FlashcardsPage";
 import ProfilePage from "@/pages/ProfilePage";
+import TopicPhrasesPage from "@/pages/spanish/TopicPhrasesPage"
 
 export default function App() {
   return (
