@@ -138,6 +138,44 @@ export default function GrammarPage() {
   useTelegramInit("#FFFFFFFF", false);
   const [selectedTopic, setSelectedTopic] = useState<number | null>(null);
 
+  // Состояния для генерации фраз
+  const [phrasePrompt, setPhrasePrompt] = useState('');
+  const [generatedPhrase, setGeneratedPhrase] = useState('');
+  const [loadingPhrase, setLoadingPhrase] = useState(false);
+  const [phraseError, setPhraseError] = useState<string | null>(null);
+
+  const handleGeneratePhrase = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoadingPhrase(true);
+    setPhraseError(null);
+    setGeneratedPhrase(''); // Очистить предыдущий результат
+
+    try {
+      const response = await fetch('/api/generate-spanish-phrase', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ prompt: phrasePrompt }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `API error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      setGeneratedPhrase(data.phrase);
+
+    } catch (error: any) {
+      console.error('Error generating Spanish phrase:', error);
+      setPhraseError(error.message || 'Failed to generate phrase. Please try again.');
+    } finally {
+      setLoadingPhrase(false);
+    }
+  };
+
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -157,6 +195,47 @@ export default function GrammarPage() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-6">
+        {/* Секция генерации испанских фраз */}
+        <Card className="bg-white rounded-xl overflow-hidden mb-6">
+          <div className="p-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Generate Spanish Phrase (DeepSeek)</h3>
+            <form onSubmit={handleGeneratePhrase} className="space-y-4">
+              <div>
+                <label htmlFor="phrasePrompt" className="block text-sm font-medium text-gray-700">
+                  Enter your prompt:
+                </label>
+                <input
+                  type="text"
+                  id="phrasePrompt"
+                  value={phrasePrompt}
+                  onChange={(e) => setPhrasePrompt(e.target.value)}
+                  placeholder="e.g., 'Ask about the weather' or 'How to say hello'"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
+                  disabled={loadingPhrase}
+                />
+              </div>
+              <Button type="submit" disabled={loadingPhrase} className="w-full">
+                {loadingPhrase ? 'Generating...' : 'Generate Phrase'}
+              </Button>
+            </form>
+
+            {phraseError && (
+              <div className="mt-4 text-sm text-red-600">
+                Error: {phraseError}
+              </div>
+            )}
+
+            {generatedPhrase && (
+              <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                <h4 className="text-sm font-medium text-gray-900 mb-1">Generated Phrase:</h4>
+                <p className="text-gray-800 italic">{generatedPhrase}</p>
+              </div>
+            )}
+          </div>
+        </Card>
+
+
+        {/* Существующая секция грамматических тем */}
         <div className="space-y-4">
           {grammarTopics.map((topic) => (
             <motion.div
@@ -172,7 +251,7 @@ export default function GrammarPage() {
                 )}
                 onClick={() => setSelectedTopic(topic.id)}
               >
-                <div className="p-4">
+                 <div className="p-4">
                   <div className="flex items-start space-x-4">
                     <div className="text-4xl">{topic.icon}</div>
                     <div className="flex-1 min-w-0">
