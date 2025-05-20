@@ -1,8 +1,8 @@
 // src/components/App.tsx
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Layout } from "./Layout";
-import BottomBar from "./BottomBar";
+import { Layout } from "@/components/Layout";
+import BottomBar from "@/components/BottomBar";
 import HomePage from "@/pages/HomePage";
 import EnglishPage from "@/pages/english/EnglishPage";
 import Part1Page from "@/pages/english/Part1Page";
