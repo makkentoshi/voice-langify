@@ -214,7 +214,7 @@ export default function GrammarPage() {
                   disabled={loadingPhrase}
                 />
               </div>
-              <Button type="submit" disabled={loadingPhrase} className="w-full">
+              <Button disabled={loadingPhrase} className="w-full">
                 {loadingPhrase ? 'Generating...' : 'Generate Phrase'}
               </Button>
             </form>
