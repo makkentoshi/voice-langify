@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Volume2, CheckCircle2, XCircle } from "lucide-react";
-import { Button } from "../ui/Button";
+import { Button } from "../ui/button";
 import type { FlashcardType } from "../../types";
 
 interface FlashcardProps {

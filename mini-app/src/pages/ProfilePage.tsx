@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import PageTransition from '@/components/ui/PageTransition';
-import { Card } from '@/components/ui/Card';
+import { Card } from '@/components/ui/card';
 import { 
   Flame, 
   Trophy, 
@@ -11,7 +11,7 @@ import {
   Clock,
   LogOut
 } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 
 const ProfilePage: React.FC = () => {
   const streak = 7; // This would be fetched from storage
