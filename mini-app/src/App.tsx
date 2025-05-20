@@ -8,6 +8,7 @@ import EnglishPage from "@/pages/english/EnglishPage";
 import SpanishPage from "@/pages/spanish/SpanishPage";
 import FlashcardsPage from "@/pages/spanish/FlashcardsPage";
 import GrammarPage from "@/pages/spanish/GrammarPage";
+import TopicPhrasesPage from './pages/spanish/topics/TopicPhrasesPage'; 
 
 export default function App() {
   return (
@@ -19,6 +20,8 @@ export default function App() {
           <Route path="/spanish" element={<SpanishPage />} />
           <Route path="/spanish/flashcards" element={<FlashcardsPage />} />
           <Route path="/spanish/grammar" element={<GrammarPage />} />
+          <Route path="/spanish/topics/:topicId" element={<TopicPhrasesPage />} />
+
         </Route>
       </Routes>
       <BottomBar />

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, ChevronRight, BookOpen, Clock, Star } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router-dom"; // Import Link
 import { Card } from "@/components/ui/new/Card";
 import { Button } from "@/components/ui/new/Button";
 import { useTelegramInit } from "@/hooks/useTelegramInit";
@@ -95,67 +95,73 @@ export default function TopicsPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <Card
-                className={cn(
-                  "bg-white rounded-xl overflow-hidden",
-                  selectedTopic === topic.id && "ring-2 ring-blue-500"
-                )}
-                onClick={() => setSelectedTopic(topic.id)}
-              >
-                <div className="p-4">
-                  <div className="flex items-start space-x-4">
-                    <div className="text-4xl">{topic.icon}</div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-semibold text-gray-900 truncate">
-                          {topic.title}
-                        </h3>
-                        <ChevronRight className="text-gray-400" size={20} />
-                      </div>
-                      <p className="text-sm text-gray-600 mt-1">
-                        {topic.description}
-                      </p>
-                      <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
-                        <div className="flex items-center">
-                          <BookOpen className="w-4 h-4 mr-1" />
-                          <span>{topic.level}</span>
+              {/* Wrap the Card with Link */}
+              <Link to={`/spanish/topics/${topic.id}`}>
+                <Card
+                  className={cn(
+                    "bg-white rounded-xl overflow-hidden",
+                    selectedTopic === topic.id && "ring-2 ring-blue-500"
+                  )}
+                  // Removed onClick from Card to prevent navigation issues when clicking on the card itself
+                >
+                  <div className="p-4">
+                    <div className="flex items-start space-x-4">
+                      <div className="text-4xl">{topic.icon}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-lg font-semibold text-gray-900 truncate">
+                            {topic.title}
+                          </h3>
+                          <ChevronRight className="text-gray-400" size={20} />
                         </div>
-                        <div className="flex items-center">
-                          <Clock className="w-4 h-4 mr-1" />
-                          <span>{topic.duration}</span>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {topic.description}
+                        </p>
+                        <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
+                          <div className="flex items-center">
+                            <BookOpen className="w-4 h-4 mr-1" />
+                            <span>{topic.level}</span>
+                          </div>
+                          <div className="flex items-center">
+                            <Clock className="w-4 h-4 mr-1" />
+                            <span>{topic.duration}</span>
+                          </div>
+                          <div className="flex items-center">
+                            <Star className="w-4 h-4 mr-1" />
+                            <span>{topic.progress}%</span>
+                          </div>
                         </div>
-                        <div className="flex items-center">
-                          <Star className="w-4 h-4 mr-1" />
-                          <span>{topic.progress}%</span>
+                        <div className="mt-3 w-full h-1 bg-gray-100 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-blue-500 rounded-full transition-all duration-500"
+                            style={{ width: `${topic.progress}%` }}
+                          />
                         </div>
-                      </div>
-                      <div className="mt-3 w-full h-1 bg-gray-100 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-blue-500 rounded-full transition-all duration-500"
-                          style={{ width: `${topic.progress}%` }}
-                        />
                       </div>
                     </div>
-                  </div>
 
-                  {selectedTopic === topic.id && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="mt-4 pt-4 border-t border-gray-100"
-                    >
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full text-blue-500 border-blue-500"
+                    {/* You might want to reconsider the selectedTopic state and Button visibility if the whole card is a link */}
+                    {selectedTopic === topic.id && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="mt-4 pt-4 border-t border-gray-100"
                       >
-                        Continue Learning
-                      </Button>
-                    </motion.div>
-                  )}
-                </div>
-              </Card>
+                        {/* This button is now inside a Link, so clicking it will also navigate. 
+                            You might want to remove this button or change its functionality. */}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full text-white border-blue-500"
+                        >
+                          Continue Learning
+                        </Button>
+                      </motion.div>
+                    )}
+                  </div>
+                </Card>
+              </Link>
             </motion.div>
           ))}
         </div>
