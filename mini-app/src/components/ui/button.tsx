@@ -10,6 +10,7 @@ interface ButtonProps {
   fullWidth?: boolean;
   className?: string;
   icon?: React.ReactNode;
+  type?: 'button' | 'submit' | 'reset'; // Added type prop
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -21,26 +22,27 @@ export const Button: React.FC<ButtonProps> = ({
   fullWidth = false,
   className = '',
   icon,
+  type = 'button', // Default to 'button'
 }) => {
   const baseStyles = 'rounded-full font-medium flex items-center justify-center gap-2 transition-colors';
-  
+
   const variantStyles = {
     primary: 'bg-blue-500 text-white hover:bg-blue-600 active:bg-blue-700',
     secondary: 'bg-green-500 text-white hover:bg-green-600 active:bg-green-700',
     outline: 'bg-transparent border border-blue-500 text-blue-500 hover:bg-blue-50 active:bg-blue-100',
   };
-  
+
   const sizeStyles = {
     sm: 'text-sm py-1.5 px-3',
     md: 'text-base py-2 px-4',
     lg: 'text-lg py-2.5 px-5',
   };
-  
+
   const widthStyles = fullWidth ? 'w-full' : '';
   const disabledStyles = disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer';
-  
+
   const combinedStyles = `${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${widthStyles} ${disabledStyles} ${className}`;
-  
+
   return (
     <motion.button
       onClick={onClick}
@@ -48,6 +50,7 @@ export const Button: React.FC<ButtonProps> = ({
       className={combinedStyles}
       whileTap={{ scale: disabled ? 1 : 0.95 }}
       whileHover={{ scale: disabled ? 1 : 1.02 }}
+      type={type} // Pass type to the button element
     >
       {icon && <span>{icon}</span>}
       {children}
