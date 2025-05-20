@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, FormEvent, ChangeEvent } from 'react'; // Added FormEvent and ChangeEvent
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+// Assuming these imports are correct based on your project structure and tsconfig.json aliases
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button'; // Assuming you have a Button component
-import { Input } from '@/components/ui/input'; // Assuming you have an Input component
-import { Label } from '@/components/ui/label'; // Assuming you have a Label component
-import { Textarea } from '@/components/ui/textarea'; // Assuming you have a Textarea component
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { useTelegramInit } from '@/hooks/useTelegramInit';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Sparkles, Plus } from 'lucide-react'; // Added Sparkles and Plus icons
+import { ArrowLeft, Sparkles, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 
@@ -41,7 +42,7 @@ function TopicPhrasesPage() {
   const { topicId } = useParams<{ topicId: string }>();
   const navigate = useNavigate();
   const [phrases, setPhrases] = useState<Phrase[]>([]);
-  const [loadingPhrases, setLoadingPhrases] = useState(true); // State for loading existing phrases
+  const [loadingPhrases, setLoadingPhrases] = useState(true);
   const [errorFetchingPhrases, setErrorFetchingPhrases] = useState<string | null>(null);
   const [topicTitle, setTopicTitle] = useState<string>('');
 
@@ -77,7 +78,7 @@ function TopicPhrasesPage() {
       setErrorFetchingPhrases(null);
       try {
         const response = await axios.get(`https://voice-langify-8fmi.vercel.app/api/spanish-phrases/${topicId}`);
-        setPhrases(response.data.phrases || []); // Ensure phrases is an array
+        setPhrases(response.data.phrases || []);
       } catch (err: any) {
         console.error('Error fetching phrases:', err);
         setErrorFetchingPhrases(err.message || 'Failed to load phrases.');
@@ -90,7 +91,7 @@ function TopicPhrasesPage() {
       fetchPhrases();
     }
 
-  }, [topicId]); // Fetch phrases when topicId changes
+  }, [topicId]);
 
   // Function to handle phrase generation
   const handleGeneratePhrases = async () => {
@@ -101,21 +102,18 @@ function TopicPhrasesPage() {
 
     setLoadingGeneration(true);
     setErrorGeneratingPhrases(null);
-    setGeneratedPhrases([]); // Clear previous generated phrases
+    setGeneratedPhrases([]);
 
     try {
       // TODO: Replace with your actual DeepSeek generation endpoint
-      // You will need a backend endpoint that calls the DeepSeek API
       const response = await axios.post('https://voice-langify-8fmi.vercel.app/api/generate-phrase', {
         prompt: `Generate Spanish phrases and their English translations about "${generationPrompt}" for topic "${topicTitle}". Provide the response in a JSON format like: [{\"spanish\": \"...\", \"english\": \"...\", \"note\": \"...\"}]`,
-        topicId: topicId // Optionally send topicId to backend for context
+        topicId: topicId
       });
 
-      // Assuming the backend returns an array of phrases in a 'phrases' field
       if (response.data && Array.isArray(response.data.phrases)) {
         setGeneratedPhrases(response.data.phrases);
       } else {
-         // Handle unexpected response format
          setErrorGeneratingPhrases('Unexpected response format from AI.');
          console.error('Unexpected AI response:', response.data);
       }
@@ -141,27 +139,20 @@ function TopicPhrasesPage() {
     const phraseToAdd: Phrase = {
       spanish: newSpanishPhrase.trim(),
       english: newEnglishPhrase.trim(),
-      note: newPhraseNote.trim() || undefined, // Use undefined for empty note
+      note: newPhraseNote.trim() || undefined,
     };
 
     try {
-      // Use the existing endpoint to add the new phrase
       const response = await axios.post(`https://voice-langify-8fmi.vercel.app/api/add-spanish-phrases`, {
         topicId: topicId,
-        phrases: [phraseToAdd], // Send as an array with the new phrase
+        phrases: [phraseToAdd],
       });
 
       if (response.status === 201) {
-        // On success, update the local state to include the new phrase
-        // Fetching all phrases again is also an option, but updating state is faster
         setPhrases([...phrases, phraseToAdd]);
-
-        // Clear the form
         setNewSpanishPhrase('');
         setNewEnglishPhrase('');
         setNewPhraseNote('');
-
-        // Optionally show a success message
       } else {
          setErrorAddingPhrase(response.data.error || 'Failed to add phrase.');
       }
@@ -172,6 +163,25 @@ function TopicPhrasesPage() {
     } finally {
       setAddingPhrase(false);
     }
+  };
+
+  // Type annotation for form submit event
+  const handleFormSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    handleAddPhrase();
+  };
+
+  // Type annotations for input change events
+  const handleSpanishInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setNewSpanishPhrase(e.target.value);
+  };
+
+  const handleEnglishInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setNewEnglishPhrase(e.target.value);
+  };
+
+  const handleNoteInputChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    setNewPhraseNote(e.target.value);
   };
 
 
@@ -207,7 +217,7 @@ function TopicPhrasesPage() {
                     id="generationPrompt"
                     placeholder="e.g., common phrases for ordering coffee"
                     value={generationPrompt}
-                    onChange={(e) => setGenerationPrompt(e.target.value)}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => setGenerationPrompt(e.target.value)} // Added type annotation
                  />
               </div>
               <Button
@@ -231,6 +241,7 @@ function TopicPhrasesPage() {
                              <p className="font-medium">{phrase.spanish}</p>
                              <p className="text-gray-600 text-sm">{phrase.english}</p>
                              {phrase.note && <p className="text-gray-500 text-xs mt-1">Note: {phrase.note}</p>}
+                             {/* TODO: Add a button here to easily add this generated phrase to the manual addition form */}
                           </div>
                        ))}
                     </div>
@@ -245,13 +256,14 @@ function TopicPhrasesPage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                <Plus size={20} className="mr-2 text-green-500"/> Add Phrase Manually
             </h2>
-            <form onSubmit={(e) => { e.preventDefault(); handleAddPhrase(); }} className="space-y-4">
+            {/* Using handleFormSubmit with type annotation */}
+            <form onSubmit={handleFormSubmit} className="space-y-4">
                <div>
                   <Label htmlFor="newSpanishPhrase">Spanish Phrase</Label>
                   <Input
                      id="newSpanishPhrase"
                      value={newSpanishPhrase}
-                     onChange={(e) => setNewSpanishPhrase(e.target.value)}
+                     onChange={handleSpanishInputChange} // Using specific handler
                      required
                   />
                </div>
@@ -260,7 +272,7 @@ function TopicPhrasesPage() {
                   <Input
                      id="newEnglishPhrase"
                      value={newEnglishPhrase}
-                     onChange={(e) => setNewEnglishPhrase(e.target.value)}
+                     onChange={handleEnglishInputChange} // Using specific handler
                      required
                   />
                </div>
@@ -269,7 +281,7 @@ function TopicPhrasesPage() {
                   <Textarea
                      id="newPhraseNote"
                      value={newPhraseNote}
-                     onChange={(e) => setNewPhraseNote(e.target.value)}
+                     onChange={handleNoteInputChange} // Using specific handler
                   />
                </div>
                <Button
@@ -290,11 +302,11 @@ function TopicPhrasesPage() {
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Existing Phrases</h2>
         {loadingPhrases ? (
           <div className="flex justify-center items-center">
-            <div>Loading phrases...</div> {/* Replace with a spinner or styled loading indicator */}
+            <div>Loading phrases...</div>
           </div>
         ) : errorFetchingPhrases ? (
           <div className="flex justify-center items-center">
-            <div className="text-red-500">Error: {errorFetchingPhrases}</div> {/* Styled error message */}
+            <div className="text-red-500">Error: {errorFetchingPhrases}</div>
           </div>
         ) : phrases.length === 0 ? (
           <div className="text-center text-gray-600">

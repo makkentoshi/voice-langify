@@ -33,6 +33,7 @@ export default function App() {
           <Route path="spanish/game" element={<GamePage />} />
           <Route path="spanish/flashcards" element={<FlashcardsPage />} />
           <Route path="profile" element={<ProfilePage />} />
+          <Route path="/spanish/topics/:topicId" element={<TopicPhrasesPage />} />
         </Route>
       </Routes>
       <BottomBar />
